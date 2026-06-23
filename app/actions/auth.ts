@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers'
 import bcrypt from 'bcryptjs'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/db'
 import { signJWT } from '@/lib/auth'
 
 export interface ActionResponse {

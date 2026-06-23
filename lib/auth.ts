@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers'
-import { prisma } from './prisma'
+import { prisma } from './db'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'development_fallback_secret_key_at_least_32_chars_long'
 const JWT_HEADER = { alg: 'HS256', typ: 'JWT' }
