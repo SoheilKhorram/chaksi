@@ -1,6 +1,8 @@
 "use client"
 
+import { useState } from "react"
 import { cn } from "@/lib/utils"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import {
   Field,
@@ -10,12 +12,14 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { GalleryVerticalEndIcon } from "lucide-react"
+import { GalleryVerticalEndIcon, Eye, EyeOff } from "lucide-react"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const [showPassword, setShowPassword] = useState(false)
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <form>
@@ -32,22 +36,47 @@ export function LoginForm({
             </a>
             <h1 className="text-xl font-bold">Welcome to Acme Inc.</h1>
             <FieldDescription>
-              Don&apos;t have an account? <a href="#">Sign up</a>
+              Don&apos;t have an account? <Link href="/signup">Sign up</Link>
             </FieldDescription>
           </div>
           <Field>
-            <FieldLabel htmlFor="email">Email</FieldLabel>
+            <FieldLabel htmlFor="username">Username</FieldLabel>
             <Input
-              id="email"
-              type="email"
-              placeholder="m@example.com"
+              id="username"
+              name="username"
+              type="text"
+              placeholder="username"
               required
             />
           </Field>
           <Field>
+            <FieldLabel htmlFor="password">Password</FieldLabel>
+            <div className="relative w-full">
+              <Input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                className="pr-9"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none flex items-center justify-center h-6 w-6 rounded-md hover:bg-muted"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <EyeOff className="size-4" />
+                ) : (
+                  <Eye className="size-4" />
+                )}
+              </button>
+            </div>
+          </Field>
+          <Field>
             <Button type="submit">Login</Button>
           </Field>
-          <FieldSeparator>Or</FieldSeparator>
+          {/* <FieldSeparator>Or</FieldSeparator>
           <Field className="grid gap-4 sm:grid-cols-2">
             <Button variant="outline" type="button">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -67,13 +96,13 @@ export function LoginForm({
               </svg>
               Continue with Google
             </Button>
-          </Field>
+          </Field> */}
         </FieldGroup>
       </form>
-      <FieldDescription className="px-6 text-center">
+      {/* <FieldDescription className="px-6 text-center">
         By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
         and <a href="#">Privacy Policy</a>.
-      </FieldDescription>
+      </FieldDescription> */}
     </div>
   )
 }
