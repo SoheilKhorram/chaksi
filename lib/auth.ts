@@ -68,7 +68,8 @@ export async function verifyJWT(token: string, secret: string = JWT_SECRET): Pro
     const dataToSign = `${headerSegment}.${payloadSegment}`
     
     const key = await getCryptoKey(secret)
-    const signature = stringToBuffer(base64UrlDecode(signatureSegment))
+    const decodedSig = base64UrlDecode(signatureSegment)
+    const signature = Uint8Array.from(decodedSig, (c) => c.charCodeAt(0))
     
     const isValid = await crypto.subtle.verify(
       'HMAC',
@@ -104,7 +105,7 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
     const cookieStore = await cookies()
     const token = cookieStore.get('session')?.value
     if (!token) return null
-
+    
     const payload = await verifyJWT(token)
     if (!payload || !payload.userId) return null
 
