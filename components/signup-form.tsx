@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -13,17 +14,46 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { GalleryVerticalEndIcon, Eye, EyeOff } from "lucide-react"
+import { signupAction } from "@/app/actions/auth"
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setIsLoading(true)
+    setError(null)
+    setSuccess(null)
+
+    const formData = new FormData(event.currentTarget)
+    try {
+      const res = await signupAction(formData)
+      if (res.success) {
+        setSuccess("Account created successfully! Redirecting to login...")
+        setTimeout(() => {
+          router.push("/login")
+        }, 1500)
+      } else {
+        setError(res.error || "An error occurred during signup.")
+      }
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <form>
+      <form onSubmit={handleSubmit}>
         <FieldGroup>
           <div className="flex flex-col items-center gap-2 text-center">
             <a
@@ -40,6 +70,16 @@ export function SignupForm({
               Already have an account? <Link href="/login">Sign in</Link>
             </FieldDescription>
           </div>
+          {error && (
+            <div className="text-sm font-medium text-destructive bg-destructive/10 p-3 rounded-md text-center">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="text-sm font-medium text-green-600 bg-green-50 dark:bg-green-950/20 dark:text-green-400 p-3 rounded-md text-center">
+              {success}
+            </div>
+          )}
           <Field>
             <FieldLabel htmlFor="username">Username</FieldLabel>
             <Input
@@ -99,7 +139,9 @@ export function SignupForm({
             </div>
           </Field>
           <Field>
-            <Button type="submit">Create Account</Button>
+            <Button type="submit" disabled={isLoading} className="w-full">
+              {isLoading ? "Creating Account..." : "Create Account"}
+            </Button>
           </Field>
           {/* <FieldSeparator>Or</FieldSeparator>
           <Field className="grid gap-4 sm:grid-cols-2">

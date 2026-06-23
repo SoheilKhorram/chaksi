@@ -175,7 +175,17 @@ const data = {
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  user?: {
+    name: string
+    email?: string
+    avatar?: string
+  }
+}
+
+export function AppSidebar({ user, ...props }: AppSidebarProps) {
+  const displayUser = user || data.user
+
   return (
     <Sidebar variant="inset" collapsible="icon" {...props}>
       <SidebarHeader>
@@ -186,7 +196,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={displayUser} />
       </SidebarFooter>
     </Sidebar>
   )

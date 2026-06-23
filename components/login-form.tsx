@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -13,16 +14,41 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { GalleryVerticalEndIcon, Eye, EyeOff } from "lucide-react"
+import { loginAction } from "@/app/actions/auth"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setIsLoading(true)
+    setError(null)
+
+    const formData = new FormData(event.currentTarget)
+    try {
+      const res = await loginAction(formData)
+      if (res.success) {
+        router.push("/dashboard")
+        router.refresh()
+      } else {
+        setError(res.error || "An error occurred during login.")
+      }
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <form>
+      <form onSubmit={handleSubmit}>
         <FieldGroup>
           <div className="flex flex-col items-center gap-2 text-center">
             <a
@@ -39,6 +65,11 @@ export function LoginForm({
               Don&apos;t have an account? <Link href="/signup">Sign up</Link>
             </FieldDescription>
           </div>
+          {error && (
+            <div className="text-sm font-medium text-destructive bg-destructive/10 p-3 rounded-md text-center">
+              {error}
+            </div>
+          )}
           <Field>
             <FieldLabel htmlFor="username">Username</FieldLabel>
             <Input
@@ -74,7 +105,9 @@ export function LoginForm({
             </div>
           </Field>
           <Field>
-            <Button type="submit">Login</Button>
+            <Button type="submit" disabled={isLoading} className="w-full">
+              {isLoading ? "Logging in..." : "Login"}
+            </Button>
           </Field>
           {/* <FieldSeparator>Or</FieldSeparator>
           <Field className="grid gap-4 sm:grid-cols-2">
