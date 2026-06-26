@@ -13,7 +13,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { GalleryVerticalEndIcon, AudioLinesIcon, TerminalIcon, TerminalSquareIcon, BotIcon, BookOpenIcon, Settings2Icon, FrameIcon, PieChartIcon, MapIcon } from "lucide-react"
+import { GalleryVerticalEndIcon, AudioLinesIcon, TerminalIcon, TerminalSquareIcon, BotIcon, BookOpenIcon, Settings2Icon, FrameIcon, PieChartIcon, MapIcon, TrophyIcon } from "lucide-react"
 
 // This is sample data.
 const data = {
@@ -28,6 +28,13 @@ const data = {
     },
   ],
   navMain: [
+    {
+      title: "Padel Sessions",
+      url: "/dashboard/padel",
+      icon: (
+        <TrophyIcon />
+      ),
+    },
     {
       title: "Playground",
       url: "#",

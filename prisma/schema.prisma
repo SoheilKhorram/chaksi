@@ -7,9 +7,36 @@ generator client {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  username  String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String         @id @default(uuid())
+  username      String         @unique
+  password      String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  padelSessions PadelSession[]
+  padelSettings PadelSettings?
+}
+
+model PadelSession {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date       DateTime @default(now())
+  duration   Float    // E.g., 1.5 for 1.5h
+  players    String   // Opponents / partners
+  type       String   // "game" | "training"
+  price      Float    // Price of this session itself
+  extraItems Json     // Array of { name: string, price: number }
+  totalCost  Float    // Price + sum of extraItems price
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model PadelSettings {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gamePrice     Float    @default(0) // Default price per hour/session for games
+  trainingPrice Float    @default(0) // Default price per hour/session for training
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
