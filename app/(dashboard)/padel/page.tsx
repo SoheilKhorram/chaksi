@@ -17,6 +17,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { PadelClient } from "./padel-client"
+import { HeaderActions } from "@/components/header-actions"
 
 export default async function Page() {
   const user = await getAuthenticatedUser()
@@ -66,8 +67,8 @@ export default async function Page() {
     <SidebarProvider>
       <AppSidebar user={sidebarUser} />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border bg-background transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">
+        <header className="flex h-16 shrink-0 items-center justify-between border-b border-sidebar-border bg-background px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+          <div className="flex items-center gap-2">
             <SidebarTrigger className="-ms-1" />
             <Separator
               orientation="vertical"
@@ -81,6 +82,7 @@ export default async function Page() {
               </BreadcrumbList>
             </Breadcrumb>
           </div>
+          <HeaderActions />
         </header>
         <div className="flex flex-1 flex-col gap-6 p-6 bg-zinc-50/50 dark:bg-zinc-950/20">
           <PadelClient 
