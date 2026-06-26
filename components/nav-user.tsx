@@ -9,7 +9,6 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -22,7 +21,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { Skeleton } from "@/components/ui/skeleton"
-import { ChevronsUpDownIcon, SparklesIcon, BadgeCheckIcon, CreditCardIcon, BellIcon, LogOutIcon } from "lucide-react"
+import { ChevronsUpDownIcon, LogOutIcon } from "lucide-react"
 import { logoutAction } from "@/app/actions/auth"
 
 export function NavUser({
@@ -70,7 +69,7 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">کاربر</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-start text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
@@ -88,7 +87,7 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">کاربر</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-start text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
@@ -98,7 +97,7 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOutIcon />
-              Log out
+              خروج از حساب
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

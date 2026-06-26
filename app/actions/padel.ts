@@ -29,7 +29,7 @@ export async function savePadelSettingsAction(
   try {
     const user = await getAuthenticatedUser()
     if (!user) {
-      return { success: false, error: 'Unauthorized.' }
+      return { success: false, error: 'عدم دسترسی معتبر.' }
     }
 
     await prisma.padelSettings.upsert({
@@ -49,7 +49,7 @@ export async function savePadelSettingsAction(
     return { success: true }
   } catch (err) {
     console.error('Save settings error:', err)
-    return { success: false, error: 'Failed to save settings.' }
+    return { success: false, error: 'ذخیره تنظیمات ناموفق بود.' }
   }
 }
 
@@ -62,13 +62,13 @@ export async function createPadelSessionAction(
   try {
     const user = await getAuthenticatedUser()
     if (!user) {
-      return { success: false, error: 'Unauthorized.' }
+      return { success: false, error: 'عدم دسترسی معتبر.' }
     }
 
     const { date, duration, players, type, customPrice, extraItems } = input
 
     if (!date || !duration || !type) {
-      return { success: false, error: 'Missing required session details.' }
+      return { success: false, error: 'اطلاعات ضروری جلسه وارد نشده است.' }
     }
 
     // Determine the base price of the session itself
@@ -107,7 +107,7 @@ export async function createPadelSessionAction(
     return { success: true }
   } catch (err) {
     console.error('Create session error:', err)
-    return { success: false, error: 'Failed to log padel session.' }
+    return { success: false, error: 'ثبت جلسه پدل ناموفق بود.' }
   }
 }
 
@@ -120,7 +120,7 @@ export async function deletePadelSessionAction(
   try {
     const user = await getAuthenticatedUser()
     if (!user) {
-      return { success: false, error: 'Unauthorized.' }
+      return { success: false, error: 'عدم دسترسی معتبر.' }
     }
 
     const session = await prisma.padelSession.findUnique({
@@ -128,7 +128,7 @@ export async function deletePadelSessionAction(
     })
 
     if (!session || session.userId !== user.id) {
-      return { success: false, error: 'Session not found or permission denied.' }
+      return { success: false, error: 'جلسه یافت نشد یا دسترسی رد شد.' }
     }
 
     await prisma.padelSession.delete({
@@ -139,6 +139,6 @@ export async function deletePadelSessionAction(
     return { success: true }
   } catch (err) {
     console.error('Delete session error:', err)
-    return { success: false, error: 'Failed to delete padel session.' }
+    return { success: false, error: 'حذف جلسه پدل ناموفق بود.' }
   }
 }

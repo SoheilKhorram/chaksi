@@ -19,19 +19,19 @@ export async function signupAction(formData: FormData): Promise<ActionResponse> 
   const confirmPassword = formData.get('confirmPassword') as string | null
 
   if (!username || !password || !confirmPassword) {
-    return { success: false, error: 'All fields are required.' }
+    return { success: false, error: 'همه فیلدها الزامی هستند.' }
   }
 
   if (username.length < 3) {
-    return { success: false, error: 'Username must be at least 3 characters long.' }
+    return { success: false, error: 'نام کاربری باید حداقل ۳ کاراکتر باشد.' }
   }
 
   if (password.length < 6) {
-    return { success: false, error: 'Password must be at least 6 characters long.' }
+    return { success: false, error: 'رمز عبور باید حداقل ۶ کاراکتر باشد.' }
   }
 
   if (password !== confirmPassword) {
-    return { success: false, error: 'Passwords do not match.' }
+    return { success: false, error: 'رمزهای عبور با هم مطابقت ندارند.' }
   }
 
   try {
@@ -41,7 +41,7 @@ export async function signupAction(formData: FormData): Promise<ActionResponse> 
     })
 
     if (existingUser) {
-      return { success: false, error: 'Username is already taken.' }
+      return { success: false, error: 'این نام کاربری قبلاً انتخاب شده است.' }
     }
 
     // Hash the password
@@ -58,7 +58,7 @@ export async function signupAction(formData: FormData): Promise<ActionResponse> 
     return { success: true }
   } catch (err) {
     console.error('Signup error:', err)
-    return { success: false, error: 'An unexpected error occurred during signup.' }
+    return { success: false, error: 'یک خطای غیرمنتظره در حین ثبت‌نام رخ داد.' }
   }
 }
 
@@ -70,7 +70,7 @@ export async function loginAction(formData: FormData): Promise<ActionResponse> {
   const password = formData.get('password') as string | null
 
   if (!username || !password) {
-    return { success: false, error: 'All fields are required.' }
+    return { success: false, error: 'همه فیلدها الزامی هستند.' }
   }
 
   try {
@@ -79,12 +79,12 @@ export async function loginAction(formData: FormData): Promise<ActionResponse> {
     })
 
     if (!user) {
-      return { success: false, error: 'Invalid username or password.' }
+      return { success: false, error: 'نام کاربری یا رمز عبور نامعتبر است.' }
     }
 
     const passwordsMatch = await bcrypt.compare(password, user.password)
     if (!passwordsMatch) {
-      return { success: false, error: 'Invalid username or password.' }
+      return { success: false, error: 'نام کاربری یا رمز عبور نامعتبر است.' }
     }
 
     // Create session token (expires in 7 days)
@@ -107,7 +107,7 @@ export async function loginAction(formData: FormData): Promise<ActionResponse> {
     return { success: true }
   } catch (err) {
     console.error('Login error:', err)
-    return { success: false, error: 'An unexpected error occurred during login.' }
+    return { success: false, error: 'یک خطای غیرمنتظره در حین ورود رخ داد.' }
   }
 }
 
@@ -121,6 +121,6 @@ export async function logoutAction(): Promise<ActionResponse> {
     return { success: true }
   } catch (err) {
     console.error('Logout error:', err)
-    return { success: false, error: 'An unexpected error occurred during logout.' }
+    return { success: false, error: 'یک خطای غیرمنتظره در حین خروج رخ داد.' }
   }
 }
