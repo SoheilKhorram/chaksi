@@ -142,3 +142,71 @@ export async function deletePadelSessionAction(
     return { success: false, error: 'حذف جلسه پدل ناموفق بود.' }
   }
 }
+
+/**
+ * Updates an existing padel session.
+ */
+export async function updatePadelSessionAction(
+  sessionId: string,
+  input: PadelSessionInput
+): Promise<ActionResponse> {
+  try {
+    const user = await getAuthenticatedUser()
+    if (!user) {
+      return { success: false, error: 'عدم دسترسی معتبر.' }
+    }
+
+    const session = await prisma.padelSession.findUnique({
+      where: { id: sessionId },
+    })
+
+    if (!session || session.userId !== user.id) {
+      return { success: false, error: 'جلسه یافت نشد یا دسترسی رد شد.' }
+    }
+
+    const { date, duration, players, type, customPrice, extraItems } = input
+
+    if (!date || !duration || !type) {
+      return { success: false, error: 'اطلاعات ضروری جلسه وارد نشده است.' }
+    }
+
+    // Determine the base price of the session itself
+    let basePrice = 0
+    if (customPrice !== undefined && customPrice !== null) {
+      basePrice = Number(customPrice)
+    } else {
+      const settings = await prisma.padelSettings.findUnique({
+        where: { userId: user.id },
+      })
+      const hourlyRate = type === 'game' ? (settings?.gamePrice ?? 0) : (settings?.trainingPrice ?? 0)
+      basePrice = Number(duration) * hourlyRate
+    }
+
+    // Calculate extra items total cost
+    const extraItemsCost = extraItems.reduce(
+      (sum, item) => sum + (Number(item.price) || 0),
+      0
+    )
+    const totalCost = basePrice + extraItemsCost
+
+    await prisma.padelSession.update({
+      where: { id: sessionId },
+      data: {
+        date: new Date(date),
+        duration: Number(duration),
+        players: players.trim(),
+        type: type,
+        price: basePrice,
+        extraItems: extraItems as any, // Cast as prisma Json
+        totalCost: totalCost,
+      },
+    })
+
+    revalidatePath('/padel')
+    return { success: true }
+  } catch (err) {
+    console.error('Update session error:', err)
+    return { success: false, error: 'ویرایش جلسه پدل ناموفق بود.' }
+  }
+}
+
