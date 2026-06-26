@@ -35,7 +35,7 @@ export default async function Page() {
   })
 
   // Safely serialize database date and JSON fields for client component transition
-  const serializedSessions = sessions.map(session => ({
+  const serializedSessions = sessions.map((session: any) => ({
     id: session.id,
     userId: session.userId,
     date: session.date.toISOString(),
