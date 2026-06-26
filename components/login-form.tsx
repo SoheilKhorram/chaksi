@@ -33,7 +33,7 @@ export function LoginForm({
     try {
       const res = await loginAction(formData)
       if (res.success) {
-        router.push("/dashboard")
+        router.push("/padel")
         router.refresh()
       } else {
         setError(res.error || "خطایی در حین ورود رخ داد.")

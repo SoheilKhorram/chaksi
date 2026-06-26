@@ -45,7 +45,7 @@ export async function savePadelSettingsAction(
       },
     })
 
-    revalidatePath('/dashboard/padel')
+    revalidatePath('/padel')
     return { success: true }
   } catch (err) {
     console.error('Save settings error:', err)
@@ -103,7 +103,7 @@ export async function createPadelSessionAction(
       },
     })
 
-    revalidatePath('/dashboard/padel')
+    revalidatePath('/padel')
     return { success: true }
   } catch (err) {
     console.error('Create session error:', err)
@@ -135,7 +135,7 @@ export async function deletePadelSessionAction(
       where: { id: sessionId },
     })
 
-    revalidatePath('/dashboard/padel')
+    revalidatePath('/padel')
     return { success: true }
   } catch (err) {
     console.error('Delete session error:', err)

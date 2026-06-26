@@ -30,7 +30,7 @@ const data = {
   navMain: [
     {
       title: "جلسات پدل",
-      url: "/dashboard/padel",
+      url: "/padel",
       icon: (
         <TrophyIcon />
       ),
