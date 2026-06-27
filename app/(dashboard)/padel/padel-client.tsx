@@ -26,7 +26,16 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Calendar } from '@/components/ui/calendar'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog'
 
 interface PadelClientProps {
   initialSettings: {
@@ -470,8 +479,8 @@ export function PadelClient({ initialSettings, initialSessions }: PadelClientPro
                 key={session.id}
                 className={`group relative overflow-hidden rounded-xl border bg-white p-5 shadow-sm transition-all hover:shadow-md dark:bg-zinc-900/40 dark:hover:bg-zinc-900/60
                     ${session.type === 'game'
-                    ? 'border-l-4 border-l-emerald-500 border-zinc-200/80 dark:border-zinc-800/80'
-                    : 'border-l-4 border-l-blue-500 border-zinc-200/80 dark:border-zinc-800/80'}`}
+                    ? 'border-l-4 border-l-emerald-500 border-zinc-200/80 dark:border-zinc-800/80 dark:border-l-emerald-500/60 '
+                    : 'border-l-4 border-l-blue-500 border-zinc-200/80 dark:border-zinc-800/80 dark:border-l-blue-500/60'}`}
               >
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   {/* Info Side */}
@@ -554,688 +563,642 @@ export function PadelClient({ initialSettings, initialSessions }: PadelClientPro
       </div>
 
       {/* Settings Modal */}
-      {showSettingsModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-fade-in">
-          <div
-            className="fixed inset-0"
-            onClick={() => setShowSettingsModal(false)}
-          />
-          <div className="relative w-full max-w-sm rounded-2xl border border-zinc-200 bg-white p-5 shadow-xl dark:border-zinc-800 dark:bg-zinc-950 animate-slide-up">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Settings2Icon className="h-5 w-5 text-primary" />
-                <h3 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">نرخ‌های ساعتی پیش‌فرض</h3>
-              </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
-                onClick={() => setShowSettingsModal(false)}
-              >
-                <span className="sr-only">بستن</span>
-                <span className="text-xl leading-none">×</span>
-              </Button>
-            </div>
+      <Dialog open={showSettingsModal} onOpenChange={setShowSettingsModal}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Settings2Icon className="h-5 w-5 text-primary" />
+              <span>نرخ‌های ساعتی پیش‌فرض</span>
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              تنظیم نرخ‌های ساعتی پیش‌فرض برای بازی و تمرین پدل
+            </DialogDescription>
+          </DialogHeader>
 
-            <form onSubmit={handleSaveSettings} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="modal-gamePrice">نرخ بازی (تومان/ساعت)</Label>
-                  <Input
-                    id="modal-gamePrice"
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={gamePrice}
-                    onChange={(e) => setGamePrice(e.target.value)}
-                    placeholder="مثال: ۱۰۰۰۰۰"
-                    required
-                    className="h-9 bg-zinc-50 dark:bg-zinc-900"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="modal-trainingPrice">نرخ تمرین (تومان/ساعت)</Label>
-                  <Input
-                    id="modal-trainingPrice"
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={trainingPrice}
-                    onChange={(e) => setTrainingPrice(e.target.value)}
-                    placeholder="مثال: ۱۵۰۰۰۰"
-                    required
-                    className="h-9 bg-zinc-50 dark:bg-zinc-900"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowSettingsModal(false)}
-                  className="h-9 text-xs"
-                >
-                  انصراف
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isPending}
-                  className="h-9 text-xs font-semibold px-4"
-                >
-                  {isPending && <Loader2Icon className="me-1.5 h-3.5 w-3.5 animate-spin" />}
-                  ذخیره نرخ‌ها
-                </Button>
-              </div>
-
-              {showSettingsSuccess && (
-                <div className="flex items-center gap-1.5 text-xs text-emerald-500 font-semibold justify-end animate-fade-in mt-2">
-                  <CheckIcon className="h-4 w-4" /> ذخیره شد!
-                </div>
-              )}
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Log Session Modal */}
-      {showLogModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-fade-in overflow-y-auto">
-          <div
-            className="fixed inset-0"
-            onClick={() => setShowLogModal(false)}
-          />
-          <div className="relative w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-800 dark:bg-zinc-950 animate-slide-up my-auto max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">ثبت جلسه جدید</h2>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
-                onClick={() => setShowLogModal(false)}
-              >
-                <span className="sr-only">بستن</span>
-                <span className="text-xl leading-none">×</span>
-              </Button>
-            </div>
-
-            {formError && (
-              <div className="mb-4 rounded-lg bg-red-50 p-3 text-xs font-semibold text-red-600 dark:bg-red-500/10 dark:text-red-400">
-                {formError}
-              </div>
-            )}
-
-            {formSuccess && (
-              <div className="mb-4 rounded-lg bg-emerald-50 p-3 text-xs font-semibold text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
-                جلسه با موفقیت ثبت شد!
-              </div>
-            )}
-
-            <form onSubmit={(e) => { handleCreateSession(e); setShowLogModal(false) }} className="space-y-4">
-              {/* Type Switcher */}
+          <form onSubmit={handleSaveSettings} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label>نوع جلسه</Label>
-                <div className="grid grid-cols-2 gap-2 p-1 rounded-lg bg-zinc-100 dark:bg-zinc-800">
-                  <button
-                    type="button"
-                    onClick={() => setType('game')}
-                    className={`py-1.5 text-xs font-semibold rounded-md transition-all
-                      ${type === 'game'
-                        ? 'bg-white text-emerald-600 shadow-sm dark:bg-zinc-900 dark:text-emerald-400'
-                        : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400'}`}
-                  >
-                    بازی / مسابقه
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setType('training')}
-                    className={`py-1.5 text-xs font-semibold rounded-md transition-all
-                      ${type === 'training'
-                        ? 'bg-white text-blue-600 shadow-sm dark:bg-zinc-900 dark:text-blue-400'
-                        : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400'}`}
-                  >
-                    تمرین
-                  </button>
-                </div>
-              </div>
-
-              {/* Date */}
-              <div className="space-y-1.5">
-                <Label htmlFor="date">تاریخ</Label>
-                <div className="relative">
-                  <Button
-                    id="date"
-                    type="button"
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal h-9 px-3 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950"
-                    onClick={() => setShowDatePicker(!showDatePicker)}
-                  >
-                    <CalendarIcon className="me-2 h-4 w-4 text-zinc-400" />
-                    {selectedDate ? (
-                      selectedDate.toLocaleDateString('fa-IR', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })
-                    ) : (
-                      <span className="text-zinc-400">انتخاب تاریخ</span>
-                    )}
-                  </Button>
-
-                  {showDatePicker && (
-                    <>
-                      <div
-                        className="fixed inset-0 z-40"
-                        onClick={() => setShowDatePicker(false)}
-                      />
-                      <div className="absolute top-[100%] start-0 z-50 mt-1 rounded-xl border border-zinc-200/80 bg-white p-3 shadow-lg dark:border-zinc-800/80 dark:bg-zinc-950 animate-slide-up">
-                        <Calendar
-                          mode="single"
-                          selected={selectedDate}
-                          onSelect={(day) => {
-                            setSelectedDate(day)
-                            setShowDatePicker(false)
-                          }}
-                        />
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              {/* Duration with Preset Buttons */}
-              <div className="space-y-1.5">
-                <Label htmlFor="duration">مدت زمان (ساعت)</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="duration"
-                    type="number"
-                    min="0.1"
-                    max="12"
-                    step="0.1"
-                    value={duration}
-                    onChange={(e) => setDuration(e.target.value)}
-                    required
-                    className="h-9"
-                  />
-                  {['1.0', '1.5', '2.0'].map((val) => (
-                    <button
-                      key={val}
-                      type="button"
-                      onClick={() => setDuration(val)}
-                      className={`px-3 text-xs font-medium border border-zinc-200 rounded-lg hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800 transition-colors
-                        ${duration === val ? 'bg-zinc-100 border-zinc-300 dark:bg-zinc-800 dark:border-zinc-700' : ''}`}
-                    >
-                      {parseFloat(val).toLocaleString('fa-IR')} ساعت
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Who did you play with */}
-              <div className="space-y-1.5">
-                <Label htmlFor="players">هم‌بازی‌ها</Label>
+                <Label htmlFor="modal-gamePrice">نرخ بازی (تومان/ساعت)</Label>
                 <Input
-                  id="players"
-                  type="text"
-                  value={players}
-                  onChange={(e) => setPlayers(e.target.value)}
-                  placeholder="مثال: علی، رضا، سارا"
-                  className="h-9"
+                  id="modal-gamePrice"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={gamePrice}
+                  onChange={(e) => setGamePrice(e.target.value)}
+                  placeholder="مثال: ۱۰۰۰۰۰"
+                  required
+                  className="h-9 bg-zinc-50 dark:bg-zinc-900"
                 />
               </div>
-
-              {/* Price Customization Toggle */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="custom-price-toggle" className="cursor-pointer">قیمت‌گذاری سفارشی</Label>
-                  <input
-                    id="custom-price-toggle"
-                    type="checkbox"
-                    checked={isCustomPrice}
-                    onChange={(e) => setIsCustomPrice(e.target.checked)}
-                    className="h-4 w-4 rounded border-zinc-300 text-primary focus:ring-primary cursor-pointer"
-                  />
-                </div>
-                {isCustomPrice && (
-                  <div className="space-y-1.5 animate-slide-up">
-                    <Label htmlFor="customPrice">قیمت سفارشی (تومان)</Label>
-                    <Input
-                      id="customPrice"
-                      type="number"
-                      min="0"
-                      step="1"
-                      value={customPrice}
-                      onChange={(e) => setCustomPrice(e.target.value)}
-                      placeholder="هزینه کل جلسه را وارد کنید"
-                      required={isCustomPrice}
-                      className="h-9"
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Extra Items List */}
-              <div className="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm font-semibold">خرید اقلام جانبی</Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-7 px-2 text-xs gap-1 border-dashed"
-                    onClick={addExtraItemRow}
-                  >
-                    <PlusIcon className="h-3 w-3" /> افزودن آیتم
-                  </Button>
-                </div>
-
-                {extraItems.length > 0 && (
-                  <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
-                    {extraItems.map((item, index) => (
-                      <div key={index} className="flex gap-2 items-center animate-slide-up">
-                        <Input
-                          type="text"
-                          value={item.name}
-                          onChange={(e) => updateExtraItem(index, 'name', e.target.value)}
-                          placeholder="مثال: گریپ، آب، توپ"
-                          required
-                          className="h-8 text-xs flex-1"
-                        />
-                        <Input
-                          type="number"
-                          min="0"
-                          step="1"
-                          value={item.price}
-                          onChange={(e) => updateExtraItem(index, 'price', e.target.value)}
-                          placeholder="۰"
-                          required
-                          className="h-8 text-xs w-20"
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-zinc-400 hover:text-red-500"
-                          onClick={() => removeExtraItemRow(index)}
-                        >
-                          <Trash2Icon className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Price Preview Block */}
-              <div className="rounded-xl bg-zinc-50 border border-zinc-100 p-4 dark:bg-zinc-900/40 dark:border-zinc-800/80 text-xs space-y-2">
-                <div className="flex justify-between text-zinc-500">
-                  <span>هزینه جلسه:</span>
-                  <span>{formatPrice(calculatedPreviewPrice)}</span>
-                </div>
-                {extraItems.length > 0 && (
-                  <div className="flex justify-between text-zinc-500">
-                    <span>اقلام جانبی:</span>
-                    <span>{formatPrice(calculatedExtraCostPreview)}</span>
-                  </div>
-                )}
-                <div className="flex justify-between font-bold text-zinc-900 dark:text-zinc-50 border-t border-zinc-200/50 dark:border-zinc-800/50 pt-2 text-sm">
-                  <span>مجموع کل تقریبی:</span>
-                  <span>{formatPrice(calculatedTotalPreview)}</span>
-                </div>
-              </div>
-
-              {/* Submit Session */}
-              <Button
-                type="submit"
-                disabled={isPending}
-                className="w-full font-bold h-10 shadow-sm shadow-primary/10 transition-transform active:scale-[0.98]"
-              >
-                {isPending ? (
-                  <>
-                    <Loader2Icon className="me-2 h-4 w-4 animate-spin" /> در حال ثبت...
-                  </>
-                ) : (
-                  'ثبت جلسه پدل'
-                )}
-              </Button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirmModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-fade-in">
-          <div
-            className="fixed inset-0"
-            onClick={() => {
-              if (!isPending) {
-                setShowDeleteConfirmModal(false)
-                setSessionIdToDelete(null)
-              }
-            }}
-          />
-          <div className="relative w-full max-w-sm rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-800 dark:bg-zinc-950 animate-slide-up">
-            <div className="flex flex-col items-center text-center space-y-4">
-              <div className="rounded-full bg-red-50 p-3 text-red-500 dark:bg-red-500/10">
-                <AlertTriangleIcon className="h-6 w-6" />
-              </div>
               <div className="space-y-1.5">
-                <h3 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">حذف جلسه</h3>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                  آیا از حذف این جلسه مطمئن هستید؟ این عملیات غیر قابل بازگشت است.
-                </p>
+                <Label htmlFor="modal-trainingPrice">نرخ تمرین (تومان/ساعت)</Label>
+                <Input
+                  id="modal-trainingPrice"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={trainingPrice}
+                  onChange={(e) => setTrainingPrice(e.target.value)}
+                  placeholder="مثال: ۱۵۰۰۰۰"
+                  required
+                  className="h-9 bg-zinc-50 dark:bg-zinc-900"
+                />
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-6 border-t border-zinc-100 dark:border-zinc-800 mt-6">
+            <div className="flex items-center justify-end gap-3 pt-2">
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => {
-                  setShowDeleteConfirmModal(false)
-                  setSessionIdToDelete(null)
-                }}
-                disabled={isPending}
+                onClick={() => setShowSettingsModal(false)}
                 className="h-9 text-xs"
               >
                 انصراف
               </Button>
               <Button
-                type="button"
-                onClick={handleConfirmDelete}
-                disabled={isPending}
-                variant="destructive"
-                className="h-9 text-xs font-semibold px-4 bg-red-600 hover:bg-red-700 text-white"
-              >
-                {isPending && <Loader2Icon className="me-1.5 h-3.5 w-3.5 animate-spin" />}
-                حذف جلسه
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Session Modal */}
-      {showEditModal && sessionToEdit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-fade-in overflow-y-auto">
-          <div
-            className="fixed inset-0"
-            onClick={() => {
-              if (!isPending) {
-                setShowEditModal(false)
-                setSessionToEdit(null)
-              }
-            }}
-          />
-          <div className="relative w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-800 dark:bg-zinc-950 animate-slide-up my-auto max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">ویرایش جلسه</h2>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
-                onClick={() => {
-                  setShowEditModal(false)
-                  setSessionToEdit(null)
-                }}
-                disabled={isPending}
-              >
-                <span className="sr-only">بستن</span>
-                <span className="text-xl leading-none">×</span>
-              </Button>
-            </div>
-
-            {editFormError && (
-              <div className="mb-4 rounded-lg bg-red-50 p-3 text-xs font-semibold text-red-600 dark:bg-red-500/10 dark:text-red-400">
-                {editFormError}
-              </div>
-            )}
-
-            {editFormSuccess && (
-              <div className="mb-4 rounded-lg bg-emerald-50 p-3 text-xs font-semibold text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
-                تغییرات با موفقیت ذخیره شد!
-              </div>
-            )}
-
-            <form onSubmit={handleUpdateSession} className="space-y-4">
-              {/* Type Switcher */}
-              <div className="space-y-1.5">
-                <Label>نوع جلسه</Label>
-                <div className="grid grid-cols-2 gap-2 p-1 rounded-lg bg-zinc-100 dark:bg-zinc-800">
-                  <button
-                    type="button"
-                    onClick={() => setEditType('game')}
-                    className={`py-1.5 text-xs font-semibold rounded-md transition-all
-                      ${editType === 'game'
-                        ? 'bg-white text-emerald-600 shadow-sm dark:bg-zinc-900 dark:text-emerald-400'
-                        : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400'}`}
-                  >
-                    بازی / مسابقه
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEditType('training')}
-                    className={`py-1.5 text-xs font-semibold rounded-md transition-all
-                      ${editType === 'training'
-                        ? 'bg-white text-blue-600 shadow-sm dark:bg-zinc-900 dark:text-blue-400'
-                        : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400'}`}
-                  >
-                    تمرین
-                  </button>
-                </div>
-              </div>
-
-              {/* Date */}
-              <div className="space-y-1.5">
-                <Label htmlFor="edit-date">تاریخ</Label>
-                <div className="relative">
-                  <Button
-                    id="edit-date"
-                    type="button"
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal h-9 px-3 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950"
-                    onClick={() => setShowEditDatePicker(!showEditDatePicker)}
-                  >
-                    <CalendarIcon className="me-2 h-4 w-4 text-zinc-400" />
-                    {editDate ? (
-                      editDate.toLocaleDateString('fa-IR', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })
-                    ) : (
-                      <span className="text-zinc-400">انتخاب تاریخ</span>
-                    )}
-                  </Button>
-
-                  {showEditDatePicker && (
-                    <>
-                      <div
-                        className="fixed inset-0 z-40"
-                        onClick={() => setShowEditDatePicker(false)}
-                      />
-                      <div className="absolute top-[100%] start-0 z-50 mt-1 rounded-xl border border-zinc-200/80 bg-white p-3 shadow-lg dark:border-zinc-800/80 dark:bg-zinc-950 animate-slide-up">
-                        <Calendar
-                          mode="single"
-                          selected={editDate}
-                          onSelect={(day) => {
-                            setEditDate(day)
-                            setShowEditDatePicker(false)
-                          }}
-                        />
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              {/* Duration with Preset Buttons */}
-              <div className="space-y-1.5">
-                <Label htmlFor="edit-duration">مدت زمان (ساعت)</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="edit-duration"
-                    type="number"
-                    min="0.1"
-                    max="12"
-                    step="0.1"
-                    value={editDuration}
-                    onChange={(e) => setEditDuration(e.target.value)}
-                    required
-                    className="h-9"
-                  />
-                  {['1.0', '1.5', '2.0'].map((val) => (
-                    <button
-                      key={val}
-                      type="button"
-                      onClick={() => setEditDuration(val)}
-                      className={`px-3 text-xs font-medium border border-zinc-200 rounded-lg hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800 transition-colors
-                        ${editDuration === val ? 'bg-zinc-100 border-zinc-300 dark:bg-zinc-800 dark:border-zinc-700' : ''}`}
-                    >
-                      {parseFloat(val).toLocaleString('fa-IR')} ساعت
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Who did you play with */}
-              <div className="space-y-1.5">
-                <Label htmlFor="edit-players">هم‌بازی‌ها</Label>
-                <Input
-                  id="edit-players"
-                  type="text"
-                  value={editPlayers}
-                  onChange={(e) => setEditPlayers(e.target.value)}
-                  placeholder="مثال: علی، رضا، سارا"
-                  className="h-9"
-                />
-              </div>
-
-              {/* Price Customization Toggle */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="edit-custom-price-toggle" className="cursor-pointer">قیمت‌گذاری سفارشی</Label>
-                  <input
-                    id="edit-custom-price-toggle"
-                    type="checkbox"
-                    checked={isEditCustomPrice}
-                    onChange={(e) => setIsEditCustomPrice(e.target.checked)}
-                    className="h-4 w-4 rounded border-zinc-300 text-primary focus:ring-primary cursor-pointer"
-                  />
-                </div>
-                {isEditCustomPrice && (
-                  <div className="space-y-1.5 animate-slide-up">
-                    <Label htmlFor="editCustomPrice">قیمت سفارشی (تومان)</Label>
-                    <Input
-                      id="editCustomPrice"
-                      type="number"
-                      min="0"
-                      step="1"
-                      value={editCustomPrice}
-                      onChange={(e) => setEditCustomPrice(e.target.value)}
-                      placeholder="هزینه کل جلسه را وارد کنید"
-                      required={isEditCustomPrice}
-                      className="h-9"
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Extra Items List */}
-              <div className="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm font-semibold">خرید اقلام جانبی</Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-7 px-2 text-xs gap-1 border-dashed"
-                    onClick={addEditExtraItemRow}
-                  >
-                    <PlusIcon className="h-3 w-3" /> افزودن آیتم
-                  </Button>
-                </div>
-
-                {editExtraItems.length > 0 && (
-                  <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
-                    {editExtraItems.map((item, index) => (
-                      <div key={index} className="flex gap-2 items-center animate-slide-up">
-                        <Input
-                          type="text"
-                          value={item.name}
-                          onChange={(e) => updateEditExtraItem(index, 'name', e.target.value)}
-                          placeholder="مثال: گریپ، آب، توپ"
-                          required
-                          className="h-8 text-xs flex-1"
-                        />
-                        <Input
-                          type="number"
-                          min="0"
-                          step="1"
-                          value={item.price}
-                          onChange={(e) => updateEditExtraItem(index, 'price', e.target.value)}
-                          placeholder="۰"
-                          required
-                          className="h-8 text-xs w-20"
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-zinc-400 hover:text-red-500"
-                          onClick={() => removeEditExtraItemRow(index)}
-                        >
-                          <Trash2Icon className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Price Preview Block */}
-              <div className="rounded-xl bg-zinc-50 border border-zinc-100 p-4 dark:bg-zinc-900/40 dark:border-zinc-800/80 text-xs space-y-2">
-                <div className="flex justify-between text-zinc-500">
-                  <span>هزینه جلسه:</span>
-                  <span>{formatPrice(calculatedEditPreviewPrice)}</span>
-                </div>
-                {editExtraItems.length > 0 && (
-                  <div className="flex justify-between text-zinc-500">
-                    <span>اقلام جانبی:</span>
-                    <span>{formatPrice(calculatedEditExtraCostPreview)}</span>
-                  </div>
-                )}
-                <div className="flex justify-between font-bold text-zinc-900 dark:text-zinc-50 border-t border-zinc-200/50 dark:border-zinc-800/50 pt-2 text-sm">
-                  <span>مجموع کل تقریبی:</span>
-                  <span>{formatPrice(calculatedEditTotalPreview)}</span>
-                </div>
-              </div>
-
-              {/* Submit Session */}
-              <Button
                 type="submit"
                 disabled={isPending}
-                className="w-full font-bold h-10 shadow-sm shadow-primary/10 transition-transform active:scale-[0.98]"
+                className="h-9 text-xs font-semibold px-4"
               >
-                {isPending ? (
-                  <>
-                    <Loader2Icon className="me-2 h-4 w-4 animate-spin" /> در حال ذخیره...
-                  </>
-                ) : (
-                  'ذخیره تغییرات'
-                )}
+                {isPending && <Loader2Icon className="me-1.5 h-3.5 w-3.5 animate-spin" />}
+                ذخیره نرخ‌ها
               </Button>
-            </form>
+            </div>
+
+            {showSettingsSuccess && (
+              <div className="flex items-center gap-1.5 text-xs text-emerald-500 font-semibold justify-end animate-fade-in mt-2">
+                <CheckIcon className="h-4 w-4" /> ذخیره شد!
+              </div>
+            )}
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Log Session Modal */}
+      <Dialog open={showLogModal} onOpenChange={setShowLogModal}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>ثبت جلسه جدید</DialogTitle>
+            <DialogDescription className="sr-only">
+              فرم ثبت اطلاعات جلسه جدید بازی یا تمرین پدل
+            </DialogDescription>
+          </DialogHeader>
+
+          {formError && (
+            <div className="mb-4 rounded-lg bg-red-50 p-3 text-xs font-semibold text-red-600 dark:bg-red-500/10 dark:text-red-400">
+              {formError}
+            </div>
+          )}
+
+          {formSuccess && (
+            <div className="mb-4 rounded-lg bg-emerald-50 p-3 text-xs font-semibold text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
+              جلسه با موفقیت ثبت شد!
+            </div>
+          )}
+
+          <form onSubmit={(e) => { handleCreateSession(e); setShowLogModal(false) }} className="space-y-4">
+            {/* Type Switcher */}
+            <div className="space-y-1.5">
+              <Label>نوع جلسه</Label>
+              <div className="grid grid-cols-2 gap-2 p-1 rounded-lg bg-zinc-100 dark:bg-zinc-800">
+                <button
+                  type="button"
+                  onClick={() => setType('game')}
+                  className={`py-1.5 text-xs font-semibold rounded-md transition-all
+                    ${type === 'game'
+                      ? 'bg-white text-emerald-600 shadow-sm dark:bg-zinc-900 dark:text-emerald-400'
+                      : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400'}`}
+                >
+                  بازی / مسابقه
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setType('training')}
+                  className={`py-1.5 text-xs font-semibold rounded-md transition-all
+                    ${type === 'training'
+                      ? 'bg-white text-blue-600 shadow-sm dark:bg-zinc-900 dark:text-blue-400'
+                      : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400'}`}
+                >
+                  تمرین
+                </button>
+              </div>
+            </div>
+
+            {/* Date */}
+            <div className="space-y-1.5">
+              <Label htmlFor="date">تاریخ</Label>
+              <div className="relative">
+                <Button
+                  id="date"
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal h-9 px-3 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950"
+                  onClick={() => setShowDatePicker(!showDatePicker)}
+                >
+                  <CalendarIcon className="me-2 h-4 w-4 text-zinc-400" />
+                  {selectedDate ? (
+                    selectedDate.toLocaleDateString('fa-IR', {
+                      weekday: 'long',
+                      // year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })
+                  ) : (
+                    <span className="text-zinc-400">انتخاب تاریخ</span>
+                  )}
+                </Button>
+
+                {showDatePicker && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setShowDatePicker(false)}
+                    />
+                    <div className="absolute top-[100%] start-0 z-50 mt-1 rounded-xl border border-zinc-200/80 bg-white p-3 shadow-lg dark:border-zinc-800/80 dark:bg-zinc-950 animate-slide-up">
+                      <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={(day) => {
+                          setSelectedDate(day)
+                          setShowDatePicker(false)
+                        }}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Duration with Preset Buttons */}
+            <div className="space-y-1.5">
+              <Label htmlFor="duration">مدت زمان (ساعت)</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="duration"
+                  type="number"
+                  min="0.1"
+                  max="12"
+                  step="0.1"
+                  value={duration}
+                  onChange={(e) => setDuration(e.target.value)}
+                  required
+                  className="h-9"
+                />
+                {['1.0', '1.5', '2.0'].map((val) => (
+                  <button
+                    key={val}
+                    type="button"
+                    onClick={() => setDuration(val)}
+                    className={`px-3 text-xs font-medium border border-zinc-200 rounded-lg hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800 transition-colors
+                      ${duration === val ? 'bg-zinc-100 border-zinc-300 dark:bg-zinc-800 dark:border-zinc-700' : ''}`}
+                  >
+                    {parseFloat(val).toLocaleString('fa-IR')} ساعت
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Who did you play with */}
+            <div className="space-y-1.5">
+              <Label htmlFor="players">هم‌بازی‌ها</Label>
+              <Input
+                id="players"
+                type="text"
+                value={players}
+                onChange={(e) => setPlayers(e.target.value)}
+                placeholder="مثال: علی، رضا، سارا"
+                className="h-9"
+              />
+            </div>
+
+            {/* Price Customization Toggle */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="custom-price-toggle" className="cursor-pointer">قیمت‌گذاری سفارشی</Label>
+                <Checkbox
+                  id="custom-price-toggle"
+                  checked={isCustomPrice}
+                  onCheckedChange={(checked) => setIsCustomPrice(!!checked)}
+                />
+              </div>
+              {isCustomPrice && (
+                <div className="space-y-1.5 animate-slide-up">
+                  <Input
+                    id="customPrice"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={customPrice}
+                    onChange={(e) => setCustomPrice(e.target.value)}
+                    placeholder="هزینه کل جلسه را وارد کنید"
+                    required={isCustomPrice}
+                    className="h-9"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Extra Items List */}
+            <div className="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-semibold">خرید اقلام جانبی</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 px-2 text-xs gap-1 border-dashed"
+                  onClick={addExtraItemRow}
+                >
+                  <PlusIcon className="h-3 w-3" /> افزودن آیتم
+                </Button>
+              </div>
+
+              {extraItems.length > 0 && (
+                <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
+                  {extraItems.map((item, index) => (
+                    <div key={index} className="flex gap-2 items-center animate-slide-up">
+                      <Input
+                        type="text"
+                        value={item.name}
+                        onChange={(e) => updateExtraItem(index, 'name', e.target.value)}
+                        placeholder="مثال: گریپ، آب، توپ"
+                        required
+                        className="h-8 text-xs flex-1"
+                      />
+                      <Input
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={item.price}
+                        onChange={(e) => updateExtraItem(index, 'price', e.target.value)}
+                        placeholder="۰"
+                        required
+                        className="h-8 text-xs w-20"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-zinc-400 hover:text-red-500"
+                        onClick={() => removeExtraItemRow(index)}
+                      >
+                        <Trash2Icon className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Price Preview Block */}
+            <div className="rounded-xl bg-zinc-50 border border-zinc-100 p-4 dark:bg-zinc-900/40 dark:border-zinc-800/80 text-xs space-y-2">
+              <div className="flex justify-between text-zinc-500">
+                <span>هزینه جلسه:</span>
+                <span>{formatPrice(calculatedPreviewPrice)}</span>
+              </div>
+              {extraItems.length > 0 && (
+                <div className="flex justify-between text-zinc-500">
+                  <span>اقلام جانبی:</span>
+                  <span>{formatPrice(calculatedExtraCostPreview)}</span>
+                </div>
+              )}
+              <div className="flex justify-between font-bold text-zinc-900 dark:text-zinc-50 border-t border-zinc-200/50 dark:border-zinc-800/50 pt-2 text-sm">
+                <span>مجموع کل تقریبی:</span>
+                <span>{formatPrice(calculatedTotalPreview)}</span>
+              </div>
+            </div>
+
+            {/* Submit Session */}
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="w-full font-bold h-10 shadow-sm shadow-primary/10 transition-transform active:scale-[0.98]"
+            >
+              {isPending ? (
+                <>
+                  <Loader2Icon className="me-2 h-4 w-4 animate-spin" /> در حال ثبت...
+                </>
+              ) : (
+                'ثبت جلسه پدل'
+              )}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog
+        open={showDeleteConfirmModal}
+        onOpenChange={(open) => {
+          if (!open && !isPending) {
+            setShowDeleteConfirmModal(false)
+            setSessionIdToDelete(null)
+          }
+        }}
+      >
+        <DialogContent className="max-w-sm" showCloseButton={!isPending}>
+          <div className="flex flex-col items-center text-center space-y-4 pt-4">
+            <div className="rounded-full bg-red-50 p-3 text-red-500 dark:bg-red-500/10">
+              <AlertTriangleIcon className="h-6 w-6" />
+            </div>
+            <div className="space-y-1.5">
+              <DialogTitle className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 text-center">
+                حذف جلسه
+              </DialogTitle>
+              <DialogDescription className="text-sm text-zinc-500 dark:text-zinc-400 text-center">
+                آیا از حذف این جلسه مطمئن هستید؟
+              </DialogDescription>
+            </div>
           </div>
-        </div>
-      )}
+
+          <DialogFooter className="flex items-center justify-end gap-3 pt-6 border-t border-zinc-100 dark:border-zinc-800 mt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setShowDeleteConfirmModal(false)
+                setSessionIdToDelete(null)
+              }}
+              disabled={isPending}
+              className="h-9 text-xs"
+            >
+              انصراف
+            </Button>
+            <Button
+              type="button"
+              onClick={handleConfirmDelete}
+              disabled={isPending}
+              variant="destructive"
+              className="h-9 text-xs font-semibold px-4 bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isPending && <Loader2Icon className="me-1.5 h-3.5 w-3.5 animate-spin" />}
+              حذف جلسه
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Session Modal */}
+      <Dialog
+        open={showEditModal}
+        onOpenChange={(open) => {
+          if (!open && !isPending) {
+            setShowEditModal(false)
+            setSessionToEdit(null)
+          }
+        }}
+      >
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto" showCloseButton={!isPending}>
+          <DialogHeader>
+            <DialogTitle>ویرایش جلسه</DialogTitle>
+            <DialogDescription className="sr-only">
+              ویرایش اطلاعات مربوط به جلسه بازی یا تمرین پدل ثبت شده
+            </DialogDescription>
+          </DialogHeader>
+
+          {editFormError && (
+            <div className="mb-4 rounded-lg bg-red-50 p-3 text-xs font-semibold text-red-600 dark:bg-red-500/10 dark:text-red-400">
+              {editFormError}
+            </div>
+          )}
+
+          {editFormSuccess && (
+            <div className="mb-4 rounded-lg bg-emerald-50 p-3 text-xs font-semibold text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
+              تغییرات با موفقیت ذخیره شد!
+            </div>
+          )}
+
+          <form onSubmit={handleUpdateSession} className="space-y-4">
+            {/* Type Switcher */}
+            <div className="space-y-1.5">
+              <Label>نوع جلسه</Label>
+              <div className="grid grid-cols-2 gap-2 p-1 rounded-lg bg-zinc-100 dark:bg-zinc-800">
+                <button
+                  type="button"
+                  onClick={() => setEditType('game')}
+                  className={`py-1.5 text-xs font-semibold rounded-md transition-all
+                    ${editType === 'game'
+                      ? 'bg-white text-emerald-600 shadow-sm dark:bg-zinc-900 dark:text-emerald-400'
+                      : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400'}`}
+                >
+                  بازی / مسابقه
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditType('training')}
+                  className={`py-1.5 text-xs font-semibold rounded-md transition-all
+                    ${editType === 'training'
+                      ? 'bg-white text-blue-600 shadow-sm dark:bg-zinc-900 dark:text-blue-400'
+                      : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400'}`}
+                >
+                  تمرین
+                </button>
+              </div>
+            </div>
+
+            {/* Date */}
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-date">تاریخ</Label>
+              <div className="relative">
+                <Button
+                  id="edit-date"
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal h-9 px-3 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950"
+                  onClick={() => setShowEditDatePicker(!showEditDatePicker)}
+                >
+                  <CalendarIcon className="me-2 h-4 w-4 text-zinc-400" />
+                  {editDate ? (
+                    editDate.toLocaleDateString('fa-IR', {
+                      weekday: 'long',
+                      // year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })
+                  ) : (
+                    <span className="text-zinc-400">انتخاب تاریخ</span>
+                  )}
+                </Button>
+
+                {showEditDatePicker && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setShowEditDatePicker(false)}
+                    />
+                    <div className="absolute top-[100%] start-0 z-50 mt-1 rounded-xl border border-zinc-200/80 bg-white p-3 shadow-lg dark:border-zinc-800/80 dark:bg-zinc-950 animate-slide-up">
+                      <Calendar
+                        mode="single"
+                        selected={editDate}
+                        onSelect={(day) => {
+                          setEditDate(day)
+                          setShowEditDatePicker(false)
+                        }}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Duration with Preset Buttons */}
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-duration">مدت زمان (ساعت)</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="edit-duration"
+                  type="number"
+                  min="0.1"
+                  max="12"
+                  step="0.1"
+                  value={editDuration}
+                  onChange={(e) => setEditDuration(e.target.value)}
+                  required
+                  className="h-9"
+                />
+                {['1.0', '1.5', '2.0'].map((val) => (
+                  <button
+                    key={val}
+                    type="button"
+                    onClick={() => setEditDuration(val)}
+                    className={`px-3 text-xs font-medium border border-zinc-200 rounded-lg hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800 transition-colors
+                      ${editDuration === val ? 'bg-zinc-100 border-zinc-300 dark:bg-zinc-800 dark:border-zinc-700' : ''}`}
+                  >
+                    {parseFloat(val).toLocaleString('fa-IR')} ساعت
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Who did you play with */}
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-players">هم‌بازی‌ها</Label>
+              <Input
+                id="edit-players"
+                type="text"
+                value={editPlayers}
+                onChange={(e) => setEditPlayers(e.target.value)}
+                placeholder="مثال: علی، رضا، سارا"
+                className="h-9"
+              />
+            </div>
+
+            {/* Price Customization Toggle */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="edit-custom-price-toggle" className="cursor-pointer">قیمت‌گذاری سفارشی</Label>
+                <Checkbox
+                  id="edit-custom-price-toggle"
+                  checked={isEditCustomPrice}
+                  onCheckedChange={(checked) => setIsEditCustomPrice(!!checked)}
+                />
+              </div>
+              {isEditCustomPrice && (
+                <div className="space-y-1.5 animate-slide-up">
+                  <Label htmlFor="editCustomPrice">قیمت سفارشی (تومان)</Label>
+                  <Input
+                    id="editCustomPrice"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={editCustomPrice}
+                    onChange={(e) => setEditCustomPrice(e.target.value)}
+                    placeholder="هزینه کل جلسه را وارد کنید"
+                    required={isEditCustomPrice}
+                    className="h-9"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Extra Items List */}
+            <div className="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-semibold">خرید اقلام جانبی</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 px-2 text-xs gap-1 border-dashed"
+                  onClick={addEditExtraItemRow}
+                >
+                  <PlusIcon className="h-3 w-3" /> افزودن آیتم
+                </Button>
+              </div>
+
+              {editExtraItems.length > 0 && (
+                <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
+                  {editExtraItems.map((item, index) => (
+                    <div key={index} className="flex gap-2 items-center animate-slide-up">
+                      <Input
+                        type="text"
+                        value={item.name}
+                        onChange={(e) => updateEditExtraItem(index, 'name', e.target.value)}
+                        placeholder="مثال: گریپ، آب، توپ"
+                        required
+                        className="h-8 text-xs flex-1"
+                      />
+                      <Input
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={item.price}
+                        onChange={(e) => updateEditExtraItem(index, 'price', e.target.value)}
+                        placeholder="۰"
+                        required
+                        className="h-8 text-xs w-20"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-zinc-400 hover:text-red-500"
+                        onClick={() => removeEditExtraItemRow(index)}
+                      >
+                        <Trash2Icon className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Price Preview Block */}
+            <div className="rounded-xl bg-zinc-50 border border-zinc-100 p-4 dark:bg-zinc-900/40 dark:border-zinc-800/80 text-xs space-y-2">
+              <div className="flex justify-between text-zinc-500">
+                <span>هزینه جلسه:</span>
+                <span>{formatPrice(calculatedEditPreviewPrice)}</span>
+              </div>
+              {editExtraItems.length > 0 && (
+                <div className="flex justify-between text-zinc-500">
+                  <span>اقلام جانبی:</span>
+                  <span>{formatPrice(calculatedEditExtraCostPreview)}</span>
+                </div>
+              )}
+              <div className="flex justify-between font-bold text-zinc-900 dark:text-zinc-50 border-t border-zinc-200/50 dark:border-zinc-800/50 pt-2 text-sm">
+                <span>مجموع کل تقریبی:</span>
+                <span>{formatPrice(calculatedEditTotalPreview)}</span>
+              </div>
+            </div>
+
+            {/* Submit Session */}
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="w-full font-bold h-10 shadow-sm shadow-primary/10 transition-transform active:scale-[0.98]"
+            >
+              {isPending ? (
+                <>
+                  <Loader2Icon className="me-2 h-4 w-4 animate-spin" /> در حال ذخیره...
+                </>
+              ) : (
+                'ذخیره تغییرات'
+              )}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

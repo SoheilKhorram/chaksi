@@ -96,13 +96,13 @@ export function SignupForm({
                 id="password"
                 name="password"
                 type={showPassword ? "text" : "password"}
-                className="ps-9"
+                className="pe-9"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute start-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none flex items-center justify-center h-6 w-6 rounded-md hover:bg-muted"
+                className="absolute end-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none flex items-center justify-center h-6 w-6 rounded-md hover:bg-muted"
                 aria-label={showPassword ? "پنهان کردن رمز" : "نمایش رمز"}
               >
                 {showPassword ? (
@@ -120,13 +120,13 @@ export function SignupForm({
                 id="confirm-password"
                 name="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
-                className="ps-9"
+                className="pe-9"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute start-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none flex items-center justify-center h-6 w-6 rounded-md hover:bg-muted"
+                className="absolute end-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none flex items-center justify-center h-6 w-6 rounded-md hover:bg-muted"
                 aria-label={showConfirmPassword ? "پنهان کردن رمز" : "نمایش رمز"}
               >
                 {showConfirmPassword ? (
