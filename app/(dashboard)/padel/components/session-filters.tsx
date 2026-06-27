@@ -110,8 +110,8 @@ export function SessionFilters({
         {/* Date Ranges */}
         <div className="grid grid-cols-2 gap-2 md:col-span-5 items-end">
           {/* From Date */}
-          <div className="space-y-1.5 relative">
-            <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">از تاریخ</label>
+          <div className="relative">
+            <label className="text-xs mb-1 font-semibold text-zinc-500 dark:text-zinc-400">از تاریخ</label>
             <Button
               type="button"
               variant="outline"
@@ -153,8 +153,8 @@ export function SessionFilters({
           </div>
 
           {/* To Date */}
-          <div className="space-y-1.5 relative">
-            <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">تا تاریخ</label>
+          <div className="relative">
+            <label className="text-xs mb-1.5 font-semibold text-zinc-500 dark:text-zinc-400">تا تاریخ</label>
             <Button
               type="button"
               variant="outline"
@@ -178,10 +178,11 @@ export function SessionFilters({
               </span>
             </Button>
 
+
             {showToPicker && (
               <>
-                <div className="fixed inset-0 z-40" onClick={() => setShowToPicker(false)} />
-                <div className="absolute top-[100%] start-0 z-50 mt-1 rounded-xl border border-zinc-200/80 bg-white p-3 shadow-lg dark:border-zinc-800/80 dark:bg-zinc-950 animate-slide-up">
+                <div className="w-0 h-0" onClick={() => setShowToPicker(false)} />
+                <div className="absolute top-[100%] end-0 z-50 mt-2 rounded-xl border border-zinc-200/80 bg-white p-3 shadow-lg dark:border-zinc-800/80 dark:bg-zinc-950 animate-slide-up">
                   <Calendar
                     mode="single"
                     selected={toDate}
