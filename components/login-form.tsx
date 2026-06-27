@@ -59,9 +59,9 @@ export function LoginForm({
               </div>
               <span className="sr-only">پدل چاکسی</span>
             </a>
-            <h1 className="text-xl font-bold">به پدل چاکسی خوش آمدید</h1>
+            <h1 className="text-xl font-bold">به چاکسی خوش اومدی</h1>
             <FieldDescription>
-              حساب کاربری ندارید؟ <Link href="/signup">ثبت‌نام کنید</Link>
+              حساب کاربری نداری؟ <Link href="/signup">ثبت‌نام کن</Link>
             </FieldDescription>
           </div>
           {error && (
@@ -76,6 +76,7 @@ export function LoginForm({
               name="username"
               type="text"
               placeholder="نام کاربری خود را وارد کنید"
+              className="h-9"
               required
             />
           </Field>
@@ -86,13 +87,15 @@ export function LoginForm({
                 id="password"
                 name="password"
                 type={showPassword ? "text" : "password"}
-                className="pe-9"
+                className="pe-9 h-9"
                 required
               />
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon-xs"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute end-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none flex items-center justify-center h-6 w-6 rounded-md hover:bg-muted"
+                className="absolute end-2.5 top-1/2 -translate-y-1/2 text-muted-foreground active:not-aria-[haspopup]:-translate-y-1/2"
                 aria-label={showPassword ? "پنهان کردن رمز" : "نمایش رمز"}
               >
                 {showPassword ? (
@@ -100,11 +103,11 @@ export function LoginForm({
                 ) : (
                   <Eye className="size-4" />
                 )}
-              </button>
+              </Button>
             </div>
           </Field>
           <Field>
-            <Button type="submit" disabled={isLoading} className="w-full">
+            <Button size="lg" type="submit" disabled={isLoading} className="w-full">
               {isLoading ? "در حال ورود..." : "ورود"}
             </Button>
           </Field>
