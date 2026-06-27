@@ -201,9 +201,7 @@ export function EditSessionDialog({ open, onOpenChange, session, settings }: Edi
               <div className="space-y-1.5 animate-slide-up">
                 <Input
                   id="editCustomPrice"
-                  type="number"
-                  min="0"
-                  step="1"
+                  type="text"
                   value={customPrice}
                   onChange={(e) => setCustomPrice(e.target.value)}
                   placeholder="هزینه کل جلسه را وارد کنید"

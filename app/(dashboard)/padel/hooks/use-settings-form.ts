@@ -1,13 +1,22 @@
 import { useState, useTransition } from 'react'
 import { savePadelSettingsAction } from '@/app/actions/padel'
 import { PadelSettings } from '../types'
+import { formatInputNumber, parseInputNumber } from '../utils'
 
 export function useSettingsForm(initialSettings: PadelSettings, onSuccess?: () => void) {
   const [isPending, startTransition] = useTransition()
-  const [gamePrice, setGamePrice] = useState(initialSettings.gamePrice.toString())
-  const [trainingPrice, setTrainingPrice] = useState(initialSettings.trainingPrice.toString())
+  const [gamePrice, setGamePrice] = useState(formatInputNumber(initialSettings.gamePrice))
+  const [trainingPrice, setTrainingPrice] = useState(formatInputNumber(initialSettings.trainingPrice))
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+
+  const handleGamePriceChange = (val: string) => {
+    setGamePrice(formatInputNumber(val))
+  }
+
+  const handleTrainingPriceChange = (val: string) => {
+    setTrainingPrice(formatInputNumber(val))
+  }
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -16,8 +25,8 @@ export function useSettingsForm(initialSettings: PadelSettings, onSuccess?: () =
 
     startTransition(async () => {
       const res = await savePadelSettingsAction(
-        parseFloat(gamePrice) || 0,
-        parseFloat(trainingPrice) || 0
+        parseInputNumber(gamePrice),
+        parseInputNumber(trainingPrice)
       )
       if (res.success) {
         setSuccess(true)
@@ -35,9 +44,9 @@ export function useSettingsForm(initialSettings: PadelSettings, onSuccess?: () =
 
   return {
     gamePrice,
-    setGamePrice,
+    setGamePrice: handleGamePriceChange,
     trainingPrice,
-    setTrainingPrice,
+    setTrainingPrice: handleTrainingPriceChange,
     error,
     success,
     isPending,

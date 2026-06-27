@@ -209,9 +209,7 @@ export function LogSessionDialog({ open, onOpenChange, settings }: LogSessionDia
               <div className="space-y-1.5 animate-slide-up">
                 <Input
                   id="customPrice"
-                  type="number"
-                  min="0"
-                  step="1"
+                  type="text"
                   value={customPrice}
                   onChange={(e) => setCustomPrice(e.target.value)}
                   placeholder="هزینه کل جلسه را وارد کنید"

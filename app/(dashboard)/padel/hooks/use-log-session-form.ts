@@ -1,6 +1,7 @@
 import { useState, useTransition, useMemo } from 'react'
 import { createPadelSessionAction } from '@/app/actions/padel'
 import { PadelSettings, ExtraItemForm } from '../types'
+import { formatInputNumber, parseInputNumber } from '../utils'
 
 export function useLogSessionForm(settings: PadelSettings, onSuccess?: () => void) {
   const [isPending, startTransition] = useTransition()
@@ -17,11 +18,15 @@ export function useLogSessionForm(settings: PadelSettings, onSuccess?: () => voi
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<boolean>(false)
 
+  const handleCustomPriceChange = (val: string) => {
+    setCustomPrice(formatInputNumber(val))
+  }
+
   // Calculated Previews
   const calculatedPreviewPrice = useMemo(() => {
     const hours = parseFloat(duration) || 0
     if (isCustomPrice) {
-      return parseFloat(customPrice) || 0
+      return parseInputNumber(customPrice)
     }
     const rate = type === 'game' ? settings.gamePrice : settings.trainingPrice
     return hours * (rate || 0)
@@ -75,7 +80,7 @@ export function useLogSessionForm(settings: PadelSettings, onSuccess?: () => voi
         duration: hours,
         players: players,
         type,
-        customPrice: isCustomPrice ? parseFloat(customPrice) || 0 : null,
+        customPrice: isCustomPrice ? parseInputNumber(customPrice) : null,
         extraItems: extras
       })
 
@@ -125,7 +130,7 @@ export function useLogSessionForm(settings: PadelSettings, onSuccess?: () => voi
     isCustomPrice,
     setIsCustomPrice,
     customPrice,
-    setCustomPrice,
+    setCustomPrice: handleCustomPriceChange,
     extraItems,
     error,
     success,

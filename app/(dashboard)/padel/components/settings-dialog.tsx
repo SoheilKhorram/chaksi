@@ -55,12 +55,10 @@ export function SettingsDialog({ open, onOpenChange, initialSettings }: Settings
               <Label htmlFor="modal-gamePrice">نرخ بازی (تومان/ساعت)</Label>
               <Input
                 id="modal-gamePrice"
-                type="number"
-                min="0"
-                step="1"
+                type="text"
                 value={gamePrice}
                 onChange={(e) => setGamePrice(e.target.value)}
-                placeholder="مثال: ۱۰۰۰۰۰"
+                placeholder="مثال: ۲۵۰,۰۰۰"
                 required
                 className="h-9 bg-zinc-50 dark:bg-zinc-900"
               />
@@ -69,12 +67,10 @@ export function SettingsDialog({ open, onOpenChange, initialSettings }: Settings
               <Label htmlFor="modal-trainingPrice">نرخ تمرین (تومان/ساعت)</Label>
               <Input
                 id="modal-trainingPrice"
-                type="number"
-                min="0"
-                step="1"
+                type="text"
                 value={trainingPrice}
                 onChange={(e) => setTrainingPrice(e.target.value)}
-                placeholder="مثال: ۱۵۰۰۰۰"
+                placeholder="مثال: ۸۰۰,۰۰۰"
                 required
                 className="h-9 bg-zinc-50 dark:bg-zinc-900"
               />

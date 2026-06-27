@@ -79,7 +79,7 @@ export async function createPadelSessionAction(
       const settings = await prisma.padelSettings.findUnique({
         where: { userId: user.id },
       })
-      const hourlyRate = type === 'game' ? (settings?.gamePrice ?? 0) : (settings?.trainingPrice ?? 0)
+      const hourlyRate = type === 'game' ? (settings?.gamePrice ?? 250000) : (settings?.trainingPrice ?? 800000)
       basePrice = Number(duration) * hourlyRate
     }
 
@@ -178,7 +178,7 @@ export async function updatePadelSessionAction(
       const settings = await prisma.padelSettings.findUnique({
         where: { userId: user.id },
       })
-      const hourlyRate = type === 'game' ? (settings?.gamePrice ?? 0) : (settings?.trainingPrice ?? 0)
+      const hourlyRate = type === 'game' ? (settings?.gamePrice ?? 250000) : (settings?.trainingPrice ?? 800000)
       basePrice = Number(duration) * hourlyRate
     }
 

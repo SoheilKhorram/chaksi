@@ -1,6 +1,7 @@
 import { useState, useTransition, useMemo } from 'react'
 import { updatePadelSessionAction } from '@/app/actions/padel'
 import { PadelSession, PadelSettings, ExtraItemForm } from '../types'
+import { formatInputNumber, parseInputNumber } from '../utils'
 
 export function useEditSessionForm(
   session: PadelSession,
@@ -23,7 +24,7 @@ export function useEditSessionForm(
   const [players, setPlayers] = useState(session.players)
   const [type, setType] = useState<'game' | 'training'>(session.type)
   const [isCustomPrice, setIsCustomPrice] = useState(initialIsCustom)
-  const [customPrice, setCustomPrice] = useState(initialIsCustom ? session.price.toString() : '')
+  const [customPrice, setCustomPrice] = useState(initialIsCustom ? formatInputNumber(session.price) : '')
   const [extraItems, setExtraItems] = useState<ExtraItemForm[]>(
     session.extraItems.map(item => ({
       name: item.name,
@@ -33,11 +34,15 @@ export function useEditSessionForm(
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<boolean>(false)
 
+  const handleCustomPriceChange = (val: string) => {
+    setCustomPrice(formatInputNumber(val))
+  }
+
   // Calculated Previews
   const calculatedPreviewPrice = useMemo(() => {
     const hours = parseFloat(duration) || 0
     if (isCustomPrice) {
-      return parseFloat(customPrice) || 0
+      return parseInputNumber(customPrice)
     }
     const rate = type === 'game' ? settings.gamePrice : settings.trainingPrice
     return hours * (rate || 0)
@@ -91,7 +96,7 @@ export function useEditSessionForm(
         duration: hours,
         players: players,
         type,
-        customPrice: isCustomPrice ? parseFloat(customPrice) || 0 : null,
+        customPrice: isCustomPrice ? parseInputNumber(customPrice) : null,
         extraItems: extras
       })
 
@@ -123,7 +128,7 @@ export function useEditSessionForm(
     isCustomPrice,
     setIsCustomPrice,
     customPrice,
-    setCustomPrice,
+    setCustomPrice: handleCustomPriceChange,
     extraItems,
     error,
     success,

@@ -61,7 +61,7 @@ export default async function Page() {
 
   const defaultSettings = settings
     ? { gamePrice: settings.gamePrice, trainingPrice: settings.trainingPrice }
-    : { gamePrice: 0, trainingPrice: 0 }
+    : { gamePrice: 250000, trainingPrice: 800000 }
 
   return (
     <SidebarProvider>

@@ -35,8 +35,8 @@ model PadelSettings {
   id            String   @id @default(uuid())
   userId        String   @unique
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  gamePrice     Float    @default(0) // Default price per hour/session for games
-  trainingPrice Float    @default(0) // Default price per hour/session for training
+  gamePrice     Float    @default(250000) // Default price per hour/session for games
+  trainingPrice Float    @default(800000) // Default price per hour/session for training
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
