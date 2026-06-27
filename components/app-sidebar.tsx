@@ -8,8 +8,10 @@ import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
+  SidebarFooter,
 } from "@/components/ui/sidebar"
 import { GalleryVerticalEndIcon, TrophyIcon } from "lucide-react"
+import { NavUser } from "@/components/nav-user"
 
 // This is sample data.
 const data = {
@@ -36,14 +38,14 @@ const data = {
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   user?: {
-    name: string
-    email?: string
-    avatar?: string
-  }
+    name: string;
+    avatar?: string;
+  };
+  partner?: { id: string; username: string } | null;
 }
 
-export function AppSidebar({ user, ...props }: AppSidebarProps) {
-  // const displayUser = user
+export function AppSidebar({ user, partner = null, ...props }: AppSidebarProps) {
+  const displayUser = user ? { ...user, partner } : undefined
 
   return (
     <Sidebar variant="inset" collapsible="icon" side="right" {...props}>
@@ -53,6 +55,11 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>
+      {displayUser && (
+        <SidebarFooter>
+          <NavUser user={displayUser} />
+        </SidebarFooter>
+      )}
     </Sidebar>
   )
 }

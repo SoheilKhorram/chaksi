@@ -30,6 +30,7 @@ export function NavUser({
   user?: {
     name: string
     avatar?: string
+    partner?: { id: string; username: string } | null
   }
 }) {
   const router = useRouter()
@@ -73,6 +74,11 @@ export function NavUser({
               </Avatar>
               <div className="grid flex-1 text-start text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
+                {user.partner && (
+                  <span className="truncate text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                    هم‌تیمی: {user.partner.username}
+                  </span>
+                )}
               </div>
               <ChevronsUpDownIcon className="ms-auto size-4" />
             </SidebarMenuButton>
@@ -91,6 +97,11 @@ export function NavUser({
                 </Avatar>
                 <div className="grid flex-1 text-start text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
+                  {user.partner && (
+                    <span className="truncate text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                      هم‌تیمی: {user.partner.username}
+                    </span>
+                  )}
                 </div>
               </div>
             </DropdownMenuLabel>

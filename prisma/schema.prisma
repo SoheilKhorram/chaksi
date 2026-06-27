@@ -7,13 +7,28 @@ generator client {
 }
 
 model User {
-  id            String         @id @default(uuid())
-  username      String         @unique
-  password      String
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  padelSessions PadelSession[]
-  padelSettings PadelSettings?
+  id               String           @id @default(uuid())
+  username         String           @unique
+  password         String
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  padelSessions    PadelSession[]
+  padelSettings    PadelSettings?
+  sentRequests     PartnerRequest[] @relation("SentRequests")
+  receivedRequests PartnerRequest[] @relation("ReceivedRequests")
+}
+
+model PartnerRequest {
+  id          String   @id @default(uuid())
+  senderId    String
+  sender      User     @relation("SentRequests", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId  String
+  receiver    User     @relation("ReceivedRequests", fields: [receiverId], references: [id], onDelete: Cascade)
+  status      String   // "PENDING" | "ACCEPTED"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([senderId, receiverId])
 }
 
 model PadelSession {

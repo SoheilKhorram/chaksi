@@ -63,9 +63,50 @@ export default async function Page() {
     ? { gamePrice: settings.gamePrice, trainingPrice: settings.trainingPrice }
     : { gamePrice: 250000, trainingPrice: 800000 }
 
+  // Fetch active partner connection
+  const activePartnership = await prisma.partnerRequest.findFirst({
+    where: {
+      status: 'ACCEPTED',
+      OR: [
+        { senderId: user.id },
+        { receiverId: user.id }
+      ]
+    },
+    include: {
+      sender: { select: { id: true, username: true } },
+      receiver: { select: { id: true, username: true } }
+    }
+  })
+
+  const partner = activePartnership
+    ? (activePartnership.senderId === user.id ? activePartnership.receiver : activePartnership.sender)
+    : null
+
+  // Fetch incoming pending partner requests
+  const receivedRequests = await prisma.partnerRequest.findMany({
+    where: {
+      receiverId: user.id,
+      status: 'PENDING'
+    },
+    include: {
+      sender: { select: { id: true, username: true } }
+    }
+  })
+
+  // Fetch outgoing pending partner requests
+  const sentRequests = await prisma.partnerRequest.findMany({
+    where: {
+      senderId: user.id,
+      status: 'PENDING'
+    },
+    include: {
+      receiver: { select: { id: true, username: true } }
+    }
+  })
+
   return (
     <SidebarProvider>
-      <AppSidebar user={sidebarUser} />
+      <AppSidebar user={sidebarUser} partner={partner} />
       <SidebarInset className="overflow-hidden rounded-2xl">
         <header className="flex h-16 shrink-0 items-center rounded-t-2xl justify-between border-b border-sidebar-border bg-background px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2">
@@ -82,12 +123,18 @@ export default async function Page() {
               </BreadcrumbList>
             </Breadcrumb>
           </div>
-          <HeaderActions />
+          <HeaderActions
+            user={{ id: user.id, username: user.username }}
+            partner={partner}
+            receivedRequests={receivedRequests}
+            sentRequests={sentRequests}
+          />
         </header>
         <div className="flex flex-1 flex-col gap-6 p-6">
           <PadelClient
             initialSettings={defaultSettings}
             initialSessions={serializedSessions}
+            partner={partner}
           />
         </div>
       </SidebarInset>
