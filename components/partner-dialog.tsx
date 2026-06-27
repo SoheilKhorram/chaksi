@@ -49,7 +49,9 @@ export function PartnerDialog({
   const [copied, setCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
-  const [isPending, startTransition] = useTransition()
+  const [isSendPending, startSendTransition] = useTransition()
+  const [isActionPending, startActionTransition] = useTransition()
+  const isAnyPending = isSendPending || isActionPending
 
   const handleCopyId = async () => {
     try {
@@ -72,7 +74,7 @@ export function PartnerDialog({
       return
     }
 
-    startTransition(async () => {
+    startSendTransition(async () => {
       const res = await sendPartnerRequestAction(targetId)
       if (res.success) {
         setPartnerIdInput('')
@@ -86,7 +88,7 @@ export function PartnerDialog({
   const handleAcceptRequest = (requestId: string) => {
     setError(null)
     setSuccess(null)
-    startTransition(async () => {
+    startActionTransition(async () => {
       const res = await acceptPartnerRequestAction(requestId)
       if (res.success) {
         setSuccess('هم‌تیمی شما متصل شد!')
@@ -99,7 +101,7 @@ export function PartnerDialog({
   const handleDeclineRequest = (requestId: string) => {
     setError(null)
     setSuccess(null)
-    startTransition(async () => {
+    startActionTransition(async () => {
       const res = await declinePartnerRequestAction(requestId)
       if (res.success) {
         setSuccess('درخواست با موفقیت حذف شد.')
@@ -116,7 +118,7 @@ export function PartnerDialog({
       return
     }
 
-    startTransition(async () => {
+    startActionTransition(async () => {
       const res = await disconnectPartnerAction()
       if (res.success) {
         setSuccess('ارتباط با هم‌تیمی قطع شد.')
@@ -186,7 +188,7 @@ export function PartnerDialog({
                 variant="ghost"
                 size="sm"
                 onClick={handleDisconnect}
-                disabled={isPending}
+                disabled={isAnyPending}
                 className="h-8 shrink-0 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive flex items-center gap-1"
               >
                 <UserXIcon className="h-3.5 w-3.5" />
@@ -204,15 +206,15 @@ export function PartnerDialog({
                   placeholder="کد کاربری هم‌تیمی رو وارد کن..."
                   value={partnerIdInput}
                   onChange={(e) => setPartnerIdInput(e.target.value)}
-                  disabled={isPending}
+                  disabled={isAnyPending}
                   className="h-9 text-xs"
                 />
                 <Button
                   type="submit"
-                  disabled={isPending || !partnerIdInput.trim()}
+                  disabled={isAnyPending || !partnerIdInput.trim()}
                   className="h-9 shrink-0 px-3.5 text-xs font-semibold flex items-center gap-1"
                 >
-                  {isPending ? (
+                  {isSendPending ? (
                     <Loader2Icon className="h-3.5 w-3.5 animate-spin" />
                   ) : (
                     <UserPlusIcon className="h-3.5 w-3.5" />
@@ -225,10 +227,10 @@ export function PartnerDialog({
 
           {/* Received Requests */}
           {receivedRequests.length > 0 && (
-            <div className="space-y-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+            <div className="space-y-2 pt-4 border-t border-zinc-200 dark:border-zinc-800">
               <h3 className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
                 <ClockIcon className="h-3.5 w-3.5 text-amber-500" />
-                <span>درخواست‌های دریافتی ({receivedRequests.length})</span>
+                <span>درخواست‌های دریافتی</span>
               </h3>
               <div className="space-y-1.5">
                 {receivedRequests.map((req) => (
@@ -244,7 +246,7 @@ export function PartnerDialog({
                       <Button
                         size="sm"
                         onClick={() => handleAcceptRequest(req.id)}
-                        disabled={isPending}
+                        disabled={isAnyPending}
                         className="h-7 px-3 text-[11px] font-semibold bg-emerald-600 hover:bg-emerald-700 text-white"
                       >
                         قبول
@@ -253,7 +255,7 @@ export function PartnerDialog({
                         size="sm"
                         variant="outline"
                         onClick={() => handleDeclineRequest(req.id)}
-                        disabled={isPending}
+                        disabled={isAnyPending}
                         className="h-7 px-2 text-[11px] text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100"
                       >
                         رد کردن
@@ -267,16 +269,16 @@ export function PartnerDialog({
 
           {/* Sent Requests */}
           {sentRequests.length > 0 && (
-            <div className="space-y-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+            <div className="space-y-2 pt-4 border-t border-zinc-200 dark:border-zinc-800">
               <h3 className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
                 <ClockIcon className="h-3.5 w-3.5 text-zinc-400" />
-                <span>درخواست‌های ارسالی شما ({sentRequests.length})</span>
+                <span>درخواست‌های ارسالی شما</span>
               </h3>
               <div className="space-y-1.5">
                 {sentRequests.map((req) => (
                   <div
                     key={req.id}
-                    className="flex items-center justify-between gap-3 rounded-md border border-zinc-150 p-2 px-2.5 text-xs bg-zinc-50/30 dark:border-zinc-800"
+                    className="flex items-center justify-between gap-3 rounded-md border border-zinc-150 dark:bg-zinc-900/30 p-2 px-2.5 text-xs  dark:border-zinc-800"
                   >
                     <div className="grid">
                       <span className="font-medium text-zinc-700 dark:text-zinc-300">درخواست به {req.receiver.username}</span>
@@ -286,7 +288,7 @@ export function PartnerDialog({
                       size="sm"
                       variant="ghost"
                       onClick={() => handleDeclineRequest(req.id)}
-                      disabled={isPending}
+                      disabled={isAnyPending}
                       className="h-7 px-2 text-[10px] text-destructive hover:bg-destructive/10 hover:text-destructive shrink-0"
                     >
                       لغو درخواست
