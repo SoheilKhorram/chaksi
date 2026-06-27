@@ -95,6 +95,7 @@ export async function verifyJWT(token: string, secret: string = JWT_SECRET): Pro
 export interface AuthenticatedUser {
   id: string
   username: string
+  avatar: string
   createdAt: Date
   updatedAt: Date
 }
@@ -114,6 +115,7 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
       select: {
         id: true,
         username: true,
+        avatar: true,
         createdAt: true,
         updatedAt: true,
       },

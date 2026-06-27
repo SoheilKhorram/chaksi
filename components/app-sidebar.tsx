@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { usePathname } from "next/navigation"
 
 import { NavMain } from "@/components/nav-main"
 import { TeamSwitcher } from "@/components/team-switcher"
@@ -10,31 +11,19 @@ import {
   SidebarHeader,
   SidebarFooter,
 } from "@/components/ui/sidebar"
-import { GalleryVerticalEndIcon, TrophyIcon } from "lucide-react"
+import { GalleryVerticalEndIcon, TrophyIcon, SettingsIcon } from "lucide-react"
 import { NavUser } from "@/components/nav-user"
 
-// This is sample data.
-const data = {
-  teams: [
-    {
-      name: "چاکسی",
-      logo: (
-        <GalleryVerticalEndIcon
-        />
-      ),
-      plan: "مدیریت پدل",
-    },
-  ],
-  navMain: [
-    {
-      title: "جلسات پدل",
-      url: "/padel",
-      icon: (
-        <TrophyIcon />
-      ),
-    },
-  ],
-}
+const teams = [
+  {
+    name: "چاکسی",
+    logo: (
+      <GalleryVerticalEndIcon
+      />
+    ),
+    plan: "مدیریت پدل",
+  },
+]
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   user?: {
@@ -45,15 +34,35 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 }
 
 export function AppSidebar({ user, partner = null, ...props }: AppSidebarProps) {
+  const pathname = usePathname()
   const displayUser = user ? { ...user, partner } : undefined
+
+  const navMain = [
+    {
+      title: "جلسات پدل",
+      url: "/padel",
+      icon: (
+        <TrophyIcon />
+      ),
+      isActive: pathname === "/padel",
+    },
+    {
+      title: "تنظیمات کاربری",
+      url: "/settings",
+      icon: (
+        <SettingsIcon />
+      ),
+      isActive: pathname === "/settings",
+    },
+  ]
 
   return (
     <Sidebar variant="inset" collapsible="icon" side="right" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher teams={teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navMain} />
       </SidebarContent>
       {displayUser && (
         <SidebarFooter>

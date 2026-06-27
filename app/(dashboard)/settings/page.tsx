@@ -5,10 +5,8 @@ import { AppSidebar } from "@/components/app-sidebar"
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -16,8 +14,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { PadelClient } from "./padel-client"
 import { HeaderActions } from "@/components/header-actions"
+import { SettingsClient } from "./settings-client"
 
 export default async function Page() {
   const user = await getAuthenticatedUser()
@@ -25,44 +23,6 @@ export default async function Page() {
   if (!user) {
     redirect("/login")
   }
-
-  const settings = await prisma.padelSettings.findUnique({
-    where: { userId: user.id }
-  })
-
-  const sessions = await prisma.padelSession.findMany({
-    where: { userId: user.id },
-    orderBy: { date: 'desc' }
-  })
-
-  // Safely serialize database date and JSON fields for client component transition
-  const serializedSessions = sessions.map((session: any) => ({
-    id: session.id,
-    userId: session.userId,
-    date: session.date.toISOString(),
-    duration: session.duration,
-    players: session.players,
-    type: session.type as 'game' | 'training',
-    price: session.price,
-    extraItems: Array.isArray(session.extraItems)
-      ? session.extraItems.map((item: any) => ({
-        name: String(item.name || ''),
-        price: Number(item.price || 0)
-      }))
-      : [],
-    totalCost: session.totalCost,
-    createdAt: session.createdAt.toISOString(),
-    updatedAt: session.updatedAt.toISOString(),
-  }))
-
-  const sidebarUser = {
-    name: user.username,
-    avatar: `/avatars/${user.avatar || 'cat.png'}`,
-  }
-
-  const defaultSettings = settings
-    ? { gamePrice: settings.gamePrice, trainingPrice: settings.trainingPrice }
-    : { gamePrice: 250000, trainingPrice: 800000 }
 
   // Fetch active partner connection
   const activePartnership = await prisma.partnerRequest.findFirst({
@@ -105,32 +65,15 @@ export default async function Page() {
     }
   })
 
-  // Fetch pending received shared sessions
-  const sharedSessions = await prisma.sharedSession.findMany({
-    where: { receiverId: user.id },
-    include: {
-      sender: { select: { id: true, username: true } }
-    },
-    orderBy: { createdAt: 'desc' }
-  })
+  const sidebarUser = {
+    name: user.username,
+    avatar: `/avatars/${user.avatar || 'cat.png'}`,
+  }
 
-  const serializedSharedSessions = sharedSessions.map((session: any) => ({
-    id: session.id,
-    senderId: session.senderId,
-    senderName: session.sender.username,
-    date: session.date.toISOString(),
-    duration: session.duration,
-    players: session.players,
-    type: session.type as 'game' | 'training',
-    price: session.price,
-    extraItems: Array.isArray(session.extraItems)
-      ? session.extraItems.map((item: any) => ({
-        name: String(item.name || ''),
-        price: Number(item.price || 0)
-      }))
-      : [],
-    createdAt: session.createdAt.toISOString(),
-  }))
+  const serializedUser = {
+    username: user.username,
+    avatar: user.avatar || 'cat.png',
+  }
 
   return (
     <SidebarProvider>
@@ -146,7 +89,7 @@ export default async function Page() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbPage>جلسات پدل</BreadcrumbPage>
+                  <BreadcrumbPage>تنظیمات کاربری</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
@@ -158,13 +101,8 @@ export default async function Page() {
             sentRequests={sentRequests}
           />
         </header>
-        <div className="flex flex-1 flex-col gap-6 p-6">
-          <PadelClient
-            initialSettings={defaultSettings}
-            initialSessions={serializedSessions}
-            partner={partner}
-            initialSharedSessions={serializedSharedSessions}
-          />
+        <div className="flex flex-1 flex-col gap-6 p-6 overflow-y-auto">
+          <SettingsClient user={serializedUser} />
         </div>
       </SidebarInset>
     </SidebarProvider>
