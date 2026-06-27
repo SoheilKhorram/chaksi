@@ -48,11 +48,28 @@ export async function signupAction(formData: FormData): Promise<ActionResponse> 
     const hashedPassword = await bcrypt.hash(password, 10)
 
     // Save user to the database
-    await prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         username: username.trim(),
         password: hashedPassword
       }
+    })
+
+    // Create session token (expires in 7 days)
+    const token = await signJWT({
+      userId: user.id,
+      username: user.username,
+      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7 // 7 days
+    })
+
+    // Set cookie on server-side
+    const cookieStore = await cookies()
+    cookieStore.set('session', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/'
     })
 
     return { success: true }

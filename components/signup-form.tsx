@@ -36,10 +36,11 @@ export function SignupForm({
     try {
       const res = await signupAction(formData)
       if (res.success) {
-        setSuccess("حساب کاربری با موفقیت ایجاد شد! در حال انتقال به صفحه ورود...")
+        setSuccess("حساب کاربری با موفقیت ایجاد شد! در حال انتقال...")
         setTimeout(() => {
-          router.push("/login")
-        }, 1500)
+          router.push("/padel")
+          router.refresh()
+        }, 1000)
       } else {
         setError(res.error || "خطایی در حین ثبت‌نام رخ داد.")
       }
