@@ -17,6 +17,7 @@ export interface PadelSessionInput {
   type: 'game' | 'training'
   customPrice?: number | null
   extraItems: ExtraItem[]
+  sendToPartner?: boolean
 }
 
 /**
@@ -65,7 +66,7 @@ export async function createPadelSessionAction(
       return { success: false, error: 'عدم دسترسی معتبر.' }
     }
 
-    const { date, duration, players, type, customPrice, extraItems } = input
+    const { date, duration, players, type, customPrice, extraItems, sendToPartner } = input
 
     if (!date || !duration || !type) {
       return { success: false, error: 'اطلاعات ضروری جلسه وارد نشده است.' }
@@ -102,6 +103,34 @@ export async function createPadelSessionAction(
         totalCost: totalCost,
       },
     })
+
+    if (sendToPartner) {
+      const activePartnership = await prisma.partnerRequest.findFirst({
+        where: {
+          status: 'ACCEPTED',
+          OR: [
+            { senderId: user.id },
+            { receiverId: user.id }
+          ]
+        }
+      })
+
+      if (activePartnership) {
+        const partnerId = activePartnership.senderId === user.id ? activePartnership.receiverId : activePartnership.senderId
+        await prisma.sharedSession.create({
+          data: {
+            senderId: user.id,
+            receiverId: partnerId,
+            date: new Date(date),
+            duration: Number(duration),
+            players: players.trim(),
+            type: type,
+            price: basePrice,
+            extraItems: extraItems as any,
+          }
+        })
+      }
+    }
 
     revalidatePath('/padel')
     return { success: true }
@@ -207,6 +236,92 @@ export async function updatePadelSessionAction(
   } catch (err) {
     console.error('Update session error:', err)
     return { success: false, error: 'ویرایش جلسه پدل ناموفق بود.' }
+  }
+}
+
+/**
+ * Accepts a received shared session.
+ */
+export async function acceptSharedSessionAction(
+  sharedSessionId: string
+): Promise<ActionResponse> {
+  try {
+    const user = await getAuthenticatedUser()
+    if (!user) {
+      return { success: false, error: 'عدم دسترسی معتبر.' }
+    }
+
+    const sharedSession = await prisma.sharedSession.findUnique({
+      where: { id: sharedSessionId }
+    })
+
+    if (!sharedSession || sharedSession.receiverId !== user.id) {
+      return { success: false, error: 'جلسه پیشنهادی یافت نشد.' }
+    }
+
+    const basePrice = sharedSession.price
+    const extraItems = Array.isArray(sharedSession.extraItems) ? sharedSession.extraItems : []
+    const extraItemsCost = extraItems.reduce(
+      (sum: number, item: any) => sum + (Number(item.price) || 0),
+      0
+    )
+    const totalCost = basePrice + extraItemsCost
+
+    await prisma.$transaction([
+      prisma.padelSession.create({
+        data: {
+          userId: user.id,
+          date: sharedSession.date,
+          duration: sharedSession.duration,
+          players: sharedSession.players,
+          type: sharedSession.type,
+          price: basePrice,
+          extraItems: sharedSession.extraItems as any,
+          totalCost: totalCost,
+        }
+      }),
+      prisma.sharedSession.delete({
+        where: { id: sharedSessionId }
+      })
+    ])
+
+    revalidatePath('/padel')
+    return { success: true }
+  } catch (err) {
+    console.error('Accept shared session error:', err)
+    return { success: false, error: 'افزودن جلسه ناموفق بود.' }
+  }
+}
+
+/**
+ * Declines or dismisses a shared session.
+ */
+export async function declineSharedSessionAction(
+  sharedSessionId: string
+): Promise<ActionResponse> {
+  try {
+    const user = await getAuthenticatedUser()
+    if (!user) {
+      return { success: false, error: 'عدم دسترسی معتبر.' }
+    }
+
+    const sharedSession = await prisma.sharedSession.findUnique({
+      where: { id: sharedSessionId }
+    })
+
+    if (!sharedSession || sharedSession.receiverId !== user.id) {
+      return { success: false, error: 'جلسه پیشنهادی یافت نشد.' }
+    }
+
+    await prisma.sharedSession.delete({
+      where: { id: sharedSessionId }
+    })
+
+    revalidatePath('/padel')
+    return { success: true }
+  } catch (err) {
+    console.error('Decline shared session error:', err)
+    return { success: false, error: 'رد درخواست جلسه ناموفق بود.' }
   }
 }
 

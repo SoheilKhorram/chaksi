@@ -21,3 +21,16 @@ export interface ExtraItemForm {
   name: string
   price: string
 }
+
+export interface SharedSession {
+  id: string
+  senderId: string
+  senderName: string
+  date: string
+  duration: number
+  players: string
+  type: 'game' | 'training'
+  price: number
+  extraItems: { name: string; price: number }[]
+  createdAt: string
+}

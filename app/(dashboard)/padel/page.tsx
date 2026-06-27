@@ -104,6 +104,33 @@ export default async function Page() {
     }
   })
 
+  // Fetch pending received shared sessions
+  const sharedSessions = await prisma.sharedSession.findMany({
+    where: { receiverId: user.id },
+    include: {
+      sender: { select: { id: true, username: true } }
+    },
+    orderBy: { createdAt: 'desc' }
+  })
+
+  const serializedSharedSessions = sharedSessions.map((session: any) => ({
+    id: session.id,
+    senderId: session.senderId,
+    senderName: session.sender.username,
+    date: session.date.toISOString(),
+    duration: session.duration,
+    players: session.players,
+    type: session.type as 'game' | 'training',
+    price: session.price,
+    extraItems: Array.isArray(session.extraItems)
+      ? session.extraItems.map((item: any) => ({
+        name: String(item.name || ''),
+        price: Number(item.price || 0)
+      }))
+      : [],
+    createdAt: session.createdAt.toISOString(),
+  }))
+
   return (
     <SidebarProvider>
       <AppSidebar user={sidebarUser} partner={partner} />
@@ -135,6 +162,7 @@ export default async function Page() {
             initialSettings={defaultSettings}
             initialSessions={serializedSessions}
             partner={partner}
+            initialSharedSessions={serializedSharedSessions}
           />
         </div>
       </SidebarInset>

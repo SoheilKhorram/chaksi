@@ -16,6 +16,8 @@ model User {
   padelSettings    PadelSettings?
   sentRequests     PartnerRequest[] @relation("SentRequests")
   receivedRequests PartnerRequest[] @relation("ReceivedRequests")
+  sentSharedSessions     SharedSession[]  @relation("SentSharedSessions")
+  receivedSharedSessions SharedSession[]  @relation("ReceivedSharedSessions")
 }
 
 model PartnerRequest {
@@ -54,4 +56,20 @@ model PadelSettings {
   trainingPrice Float    @default(800000) // Default price per hour/session for training
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+model SharedSession {
+  id         String   @id @default(uuid())
+  senderId   String
+  sender     User     @relation("SentSharedSessions", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId String
+  receiver   User     @relation("ReceivedSharedSessions", fields: [receiverId], references: [id], onDelete: Cascade)
+  date       DateTime
+  duration   Float
+  players    String
+  type       String   // "game" | "training"
+  price      Float
+  extraItems Json
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

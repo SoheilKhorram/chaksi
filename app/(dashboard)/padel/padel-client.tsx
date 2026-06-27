@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Settings2Icon, PlusIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { PadelSession, PadelSettings } from './types'
+import { PadelSession, PadelSettings, SharedSession } from './types'
 import { calculateStats } from './utils'
 import { StatsDashboard } from './components/stats-dashboard'
 import { SessionHistory } from './components/session-history'
@@ -12,13 +12,21 @@ import { LogSessionDialog } from './components/log-session-dialog'
 import { EditSessionDialog } from './components/edit-session-dialog'
 import { DeleteConfirmDialog } from './components/delete-confirm-dialog'
 import { SessionFilters } from './components/session-filters'
+import { SharedSessionsList } from './components/shared-sessions-list'
 
 interface PadelClientProps {
   initialSettings: PadelSettings
   initialSessions: PadelSession[]
+  partner: { id: string; username: string } | null
+  initialSharedSessions: SharedSession[]
 }
 
-export function PadelClient({ initialSettings, initialSessions }: PadelClientProps) {
+export function PadelClient({
+  initialSettings,
+  initialSessions,
+  partner,
+  initialSharedSessions
+}: PadelClientProps) {
   // Modal states
   const [showSettingsModal, setShowSettingsModal] = useState(false)
   const [showLogModal, setShowLogModal] = useState(false)
@@ -112,6 +120,9 @@ export function PadelClient({ initialSettings, initialSessions }: PadelClientPro
       {/* Metrics Dashboard */}
       <StatsDashboard stats={stats} />
 
+      {/* Shared Sessions List */}
+      <SharedSessionsList sharedSessions={initialSharedSessions} />
+
       {/* Session Filters */}
       <SessionFilters
         playersFilter={playersFilter}
@@ -151,6 +162,7 @@ export function PadelClient({ initialSettings, initialSessions }: PadelClientPro
         open={showLogModal}
         onOpenChange={setShowLogModal}
         settings={initialSettings}
+        partner={partner}
       />
 
       {/* Edit Session Modal */}

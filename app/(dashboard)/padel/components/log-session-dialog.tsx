@@ -19,9 +19,10 @@ interface LogSessionDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   settings: PadelSettings
+  partner: { id: string; username: string } | null
 }
 
-export function LogSessionDialog({ open, onOpenChange, settings }: LogSessionDialogProps) {
+export function LogSessionDialog({ open, onOpenChange, settings, partner }: LogSessionDialogProps) {
   const {
     selectedDate,
     setSelectedDate,
@@ -38,6 +39,8 @@ export function LogSessionDialog({ open, onOpenChange, settings }: LogSessionDia
     customPrice,
     setCustomPrice,
     extraItems,
+    sendToPartner,
+    setSendToPartner,
     error,
     success,
     calculatedPreviewPrice,
@@ -219,6 +222,20 @@ export function LogSessionDialog({ open, onOpenChange, settings }: LogSessionDia
               </div>
             )}
           </div>
+
+          {/* Send to Partner Option */}
+          {partner && (
+            <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 pt-3">
+              <Label htmlFor="send-to-partner" className="cursor-pointer text-sm">
+                ارسال همزمان به هم‌تیمی ({partner.username})
+              </Label>
+              <Checkbox
+                id="send-to-partner"
+                checked={sendToPartner}
+                onCheckedChange={(checked) => setSendToPartner(!!checked)}
+              />
+            </div>
+          )}
 
           {/* Extra Items List */}
           <div className="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
