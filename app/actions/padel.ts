@@ -117,6 +117,21 @@ export async function createPadelSessionAction(
 
       if (activePartnership) {
         const partnerId = activePartnership.senderId === user.id ? activePartnership.receiverId : activePartnership.senderId
+        
+        // Determine the partner's session price using the partner's default settings
+        let partnerPrice = 0
+        if (customPrice !== undefined && customPrice !== null) {
+          partnerPrice = Number(customPrice)
+        } else {
+          const partnerSettings = await prisma.padelSettings.findUnique({
+            where: { userId: partnerId },
+          })
+          const hourlyRate = type === 'game' 
+            ? (partnerSettings?.gamePrice ?? 250000) 
+            : (partnerSettings?.trainingPrice ?? 800000)
+          partnerPrice = Number(duration) * hourlyRate
+        }
+
         await prisma.sharedSession.create({
           data: {
             senderId: user.id,
@@ -125,7 +140,7 @@ export async function createPadelSessionAction(
             duration: Number(duration),
             players: players.trim(),
             type: type,
-            price: basePrice,
+            price: partnerPrice,
             extraItems: extraItems as any,
           }
         })
