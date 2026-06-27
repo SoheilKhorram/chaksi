@@ -21,7 +21,7 @@ import { HeaderActions } from "@/components/header-actions"
 
 export default async function Page() {
   const user = await getAuthenticatedUser()
-  
+
   if (!user) {
     redirect("/login")
   }
@@ -44,11 +44,11 @@ export default async function Page() {
     players: session.players,
     type: session.type as 'game' | 'training',
     price: session.price,
-    extraItems: Array.isArray(session.extraItems) 
+    extraItems: Array.isArray(session.extraItems)
       ? session.extraItems.map((item: any) => ({
-          name: String(item.name || ''),
-          price: Number(item.price || 0)
-        }))
+        name: String(item.name || ''),
+        price: Number(item.price || 0)
+      }))
       : [],
     totalCost: session.totalCost,
     createdAt: session.createdAt.toISOString(),
@@ -59,15 +59,15 @@ export default async function Page() {
     name: user.username,
   }
 
-  const defaultSettings = settings 
-    ? { gamePrice: settings.gamePrice, trainingPrice: settings.trainingPrice } 
+  const defaultSettings = settings
+    ? { gamePrice: settings.gamePrice, trainingPrice: settings.trainingPrice }
     : { gamePrice: 0, trainingPrice: 0 }
 
   return (
     <SidebarProvider>
       <AppSidebar user={sidebarUser} />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center justify-between border-b border-sidebar-border bg-background px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+      <SidebarInset className="overflow-hidden rounded-2xl">
+        <header className="flex h-16 shrink-0 items-center rounded-t-2xl justify-between border-b border-sidebar-border bg-background px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2">
             <SidebarTrigger className="-ms-1" />
             <Separator
@@ -77,15 +77,15 @@ export default async function Page() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbPage>ردیاب پدل</BreadcrumbPage>
+                  <BreadcrumbPage>جلسات پدل</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
           </div>
           <HeaderActions />
         </header>
-        <div className="flex flex-1 flex-col gap-6 p-6 bg-zinc-50/50 dark:bg-zinc-950/20">
-          <PadelClient 
+        <div className="flex flex-1 flex-col gap-6 p-6">
+          <PadelClient
             initialSettings={defaultSettings}
             initialSessions={serializedSessions}
           />

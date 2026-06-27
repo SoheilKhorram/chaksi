@@ -248,20 +248,20 @@ export function PadelClient({ initialSettings, initialSessions }: PadelClientPro
     setEditDuration(session.duration.toString())
     setEditPlayers(session.players)
     setEditType(session.type)
-    
+
     // Determine if it was a custom price or using settings rates
     const rate = session.type === 'game' ? (parseFloat(gamePrice) || 0) : (parseFloat(trainingPrice) || 0)
     const standardPrice = session.duration * rate
     const isCustom = Math.abs(standardPrice - session.price) > 0.01
-    
+
     setIsEditCustomPrice(isCustom)
     setEditCustomPrice(isCustom ? session.price.toString() : '')
-    
+
     setEditExtraItems(session.extraItems.map(item => ({
       name: item.name,
       price: item.price.toString()
     })))
-    
+
     setEditFormError(null)
     setEditFormSuccess(false)
     setShowEditModal(true)
@@ -354,8 +354,8 @@ export function PadelClient({ initialSettings, initialSessions }: PadelClientPro
       {/* Title Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">مدیریت پدل</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">جلسات بازی، تمرینات، نرخ‌ها و هزینه‌های زمین خود را ثبت و ردیابی کنید.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">مدیریت جلسات</h1>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">جلسات بازی، تمرینات، نرخ‌ها و هزینه‌های زمین خود رو ثبت و ردیابی کن.</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <Button
@@ -475,9 +475,9 @@ export function PadelClient({ initialSettings, initialSessions }: PadelClientPro
               >
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   {/* Info Side */}
-                  <div className="space-y-1.5">
+                  <div className="space-y-2.75">
                     <div className="flex items-center gap-2">
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold
+                      <span className={`inline-flex items-center rounded-full px-2.25 py-1.5 text-xs font-semibold
                           ${session.type === 'game'
                           ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
                           : 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400'}`}
@@ -489,16 +489,16 @@ export function PadelClient({ initialSettings, initialSessions }: PadelClientPro
                         <CalendarIcon className="h-3 w-3" />
                         {new Date(session.date).toLocaleDateString('fa-IR', {
                           weekday: 'long',
-                          year: 'numeric',
                           month: 'long',
-                          day: 'numeric'
+                          day: 'numeric',
+                          // year: 'numeric',
                         })}
                       </span>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-4 text-sm">
                       <div className="flex items-center gap-1 text-zinc-800 dark:text-zinc-200 font-semibold">
-                        <ClockIcon className="h-4 w-4 text-zinc-400" />
+                        <ClockIcon className="h-3.5 w-3.5 text-zinc-400" />
                         {session.duration.toLocaleString('fa-IR')} ساعت
                       </div>
                       {session.players && (
@@ -507,33 +507,21 @@ export function PadelClient({ initialSettings, initialSessions }: PadelClientPro
                           <span className="truncate max-w-[200px]" title={session.players}>{session.players}</span>
                         </div>
                       )}
+                      {session.extraItems.length > 0 && (
+                        <div
+                          className="flex items-center gap-1 text-zinc-600 dark:text-zinc-300"
+                        >
+                          <ShoppingBagIcon className="h-3 w-3 text-zinc-400" />
+                        </div>
+                      )}
                     </div>
-
-                    {/* Extra Items badges */}
-                    {session.extraItems.length > 0 && (
-                      <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                        <ShoppingBagIcon className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
-                        {session.extraItems.map((item, i) => (
-                          <span
-                            key={i}
-                            className="inline-flex items-center text-[11px] font-medium bg-zinc-50 border border-zinc-200 text-zinc-600 px-2 py-0.5 rounded dark:bg-zinc-800/80 dark:border-zinc-700 dark:text-zinc-300"
-                          >
-                            {item.name} ({formatPrice(item.price)})
-                          </span>
-                        ))}
-                      </div>
-                    )}
                   </div>
 
                   {/* Cost & Action Side */}
-                  <div className="flex items-center justify-between sm:justify-end gap-6 sm:text-right shrink-0">
+                  <div className="flex items-center justify-between sm:justify-end gap-3 sm:text-right shrink-0">
                     <div>
                       <div className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
                         {formatPrice(session.totalCost)}
-                      </div>
-                      <div className="text-xs text-zinc-400 dark:text-zinc-500">
-                        هزینه جلسه: {formatPrice(session.price)}
-                        {session.extraItems.length > 0 && ` + هزینه‌های جانبی`}
                       </div>
                     </div>
 
@@ -541,7 +529,7 @@ export function PadelClient({ initialSettings, initialSessions }: PadelClientPro
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="opacity-0 group-hover:opacity-100 transition-opacity text-zinc-400 hover:text-primary dark:hover:bg-primary/10 hover:bg-primary/5"
+                        className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity text-zinc-400 hover:text-primary dark:hover:bg-primary/10 hover:bg-primary/5"
                         onClick={() => openEditModal(session)}
                         disabled={isPending}
                       >
@@ -550,7 +538,7 @@ export function PadelClient({ initialSettings, initialSessions }: PadelClientPro
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="opacity-0 group-hover:opacity-100 transition-opacity text-zinc-400 hover:text-red-500 dark:hover:bg-red-500/10 hover:bg-red-50"
+                        className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity text-zinc-400 hover:text-red-500 dark:hover:bg-red-500/10 hover:bg-red-50"
                         onClick={() => openDeleteConfirm(session.id)}
                         disabled={isPending}
                       >
