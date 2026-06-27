@@ -11,6 +11,7 @@ import { SettingsDialog } from './components/settings-dialog'
 import { LogSessionDialog } from './components/log-session-dialog'
 import { EditSessionDialog } from './components/edit-session-dialog'
 import { DeleteConfirmDialog } from './components/delete-confirm-dialog'
+import { SessionFilters } from './components/session-filters'
 
 interface PadelClientProps {
   initialSettings: PadelSettings
@@ -28,8 +29,55 @@ export function PadelClient({ initialSettings, initialSessions }: PadelClientPro
   const [sessionIdToDelete, setSessionIdToDelete] = useState<string | null>(null)
   const [sessionToEdit, setSessionToEdit] = useState<PadelSession | null>(null)
 
-  // Calculate stats from sessions
-  const stats = calculateStats(initialSessions)
+  // Filter states
+  const [playersFilter, setPlayersFilter] = useState('')
+  const [typeFilter, setTypeFilter] = useState<'all' | 'game' | 'training'>('all')
+  const [fromDate, setFromDate] = useState<Date | undefined>(undefined)
+  const [toDate, setToDate] = useState<Date | undefined>(undefined)
+
+  const handleClearFilters = () => {
+    setPlayersFilter('')
+    setTypeFilter('all')
+    setFromDate(undefined)
+    setToDate(undefined)
+  }
+
+  const hasActiveFilters = playersFilter !== '' || typeFilter !== 'all' || fromDate !== undefined || toDate !== undefined
+
+  // Filtered sessions
+  const filteredSessions = initialSessions.filter((session) => {
+    // 1. Filter by players
+    if (playersFilter.trim() !== '') {
+      if (!session.players.toLowerCase().includes(playersFilter.toLowerCase())) {
+        return false
+      }
+    }
+
+    // 2. Filter by type
+    if (typeFilter !== 'all') {
+      if (session.type !== typeFilter) {
+        return false
+      }
+    }
+
+    // 3. Filter by date range
+    const sessionDate = new Date(session.date)
+    if (fromDate) {
+      const startOfFrom = new Date(fromDate)
+      startOfFrom.setHours(0, 0, 0, 0)
+      if (sessionDate < startOfFrom) return false
+    }
+    if (toDate) {
+      const endOfTo = new Date(toDate)
+      endOfTo.setHours(23, 59, 59, 999)
+      if (sessionDate > endOfTo) return false
+    }
+
+    return true
+  })
+
+  // Calculate stats from filtered sessions
+  const stats = calculateStats(filteredSessions)
 
   return (
     <div className="space-y-6">
@@ -62,9 +110,23 @@ export function PadelClient({ initialSettings, initialSessions }: PadelClientPro
       {/* Metrics Dashboard */}
       <StatsDashboard stats={stats} />
 
+      {/* Session Filters */}
+      <SessionFilters
+        playersFilter={playersFilter}
+        setPlayersFilter={setPlayersFilter}
+        typeFilter={typeFilter}
+        setTypeFilter={setTypeFilter}
+        fromDate={fromDate}
+        setFromDate={setFromDate}
+        toDate={toDate}
+        setToDate={setToDate}
+        onClear={handleClearFilters}
+        hasActiveFilters={hasActiveFilters}
+      />
+
       {/* Session History */}
       <SessionHistory
-        sessions={initialSessions}
+        sessions={filteredSessions}
         onEdit={(session) => {
           setSessionToEdit(session)
           setShowEditModal(true)
