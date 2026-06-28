@@ -27,6 +27,7 @@ import {
   declinePartnerRequestAction,
   disconnectPartnerAction
 } from '@/app/actions/partner'
+import { DisconnectPartnerDialog } from '@/components/disconnect-partner-dialog'
 
 interface PartnerDialogProps {
   open: boolean
@@ -49,6 +50,7 @@ export function PartnerDialog({
   const [copied, setCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false)
   const [isSendPending, startSendTransition] = useTransition()
   const [isActionPending, startActionTransition] = useTransition()
   const isAnyPending = isSendPending || isActionPending
@@ -117,24 +119,27 @@ export function PartnerDialog({
   }
 
   const handleDisconnect = () => {
+    setShowDisconnectConfirm(true)
+  }
+
+  const handleConfirmDisconnect = () => {
     setError(null)
     setSuccess(null)
-    if (!confirm('آیا مطمئن هستید که می‌خواهید ارتباط خود با هم‌تیمی فعلی را قطع کنید؟')) {
-      return
-    }
-
     startActionTransition(async () => {
       const res = await disconnectPartnerAction()
       if (res.success) {
         setSuccess('ارتباط با هم‌تیمی قطع شد.')
+        setShowDisconnectConfirm(false)
       } else {
         setError(res.error || 'قطع ارتباط ناموفق بود.')
+        setShowDisconnectConfirm(false)
       }
     })
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md" dir="rtl">
         <DialogHeader className="text-right">
           <DialogTitle className="flex items-center gap-2 text-zinc-900 dark:text-zinc-50">
@@ -306,5 +311,13 @@ export function PartnerDialog({
         </div>
       </DialogContent>
     </Dialog>
+
+    <DisconnectPartnerDialog
+      open={showDisconnectConfirm}
+      onOpenChange={setShowDisconnectConfirm}
+      onConfirm={handleConfirmDisconnect}
+      isPending={isActionPending}
+    />
+    </>
   )
 }

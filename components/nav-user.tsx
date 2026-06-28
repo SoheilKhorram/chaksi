@@ -97,18 +97,13 @@ export function NavUser({
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-fit"
+            className="w-fit mb-3.5 mr-1"
             side={isMobile ? "bottom" : "right"}
-            align="end"
             sideOffset={4}
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">کاربر</AvatarFallback>
-                </Avatar>
-                <div className="grid flex-1 text-start text-sm leading-tight">
+                <div className="grid flex-1 text-end text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
                   {user.partner && (
                     <span className="truncate text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
@@ -116,17 +111,20 @@ export function NavUser({
                     </span>
                   )}
                 </div>
+                <Avatar className="h-8 w-8 rounded-lg">
+                  <AvatarImage src={user.avatar} alt={user.name} />
+                </Avatar>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push("/settings")}>
-              <SettingsIcon className="size-4" />
+            <DropdownMenuItem className="flex items-center justify-end" onClick={() => router.push("/settings")}>
               تنظیمات کاربری
+              <SettingsIcon className="size-4" />
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => setShowLogoutConfirm(true)}>
-              <LogOutIcon />
+            <DropdownMenuItem className="flex items-center justify-end" onClick={() => setShowLogoutConfirm(true)}>
               خروج از حساب
+              <LogOutIcon />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
