@@ -32,9 +32,9 @@ interface PartnerDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   userId: string
-  partner: { id: string; username: string } | null
-  receivedRequests: Array<{ id: string; sender: { id: string; username: string } }>
-  sentRequests: Array<{ id: string; receiver: { id: string; username: string } }>
+  partner: { id: string; username: string; displayId: string } | null
+  receivedRequests: Array<{ id: string; sender: { id: string; username: string; displayId: string } }>
+  sentRequests: Array<{ id: string; receiver: { id: string; username: string; displayId: string } }>
 }
 
 export function PartnerDialog({
@@ -71,6 +71,11 @@ export function PartnerDialog({
     const targetId = partnerIdInput.trim()
     if (!targetId) {
       setError('لطفا کد هم‌تیمی را وارد کنید.')
+      return
+    }
+
+    if (!/^[A-Za-z0-9]{6}$/.test(targetId)) {
+      setError('کد هم‌تیمی باید یک شناسه ۶ کاراکتری شامل حروف و اعداد باشد.')
       return
     }
 
@@ -182,7 +187,7 @@ export function PartnerDialog({
                   هم‌تیمی متصل شده
                 </span>
                 <p className="text-sm font-bold text-zinc-800 dark:text-zinc-100">{partner.username}</p>
-                <p className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 tracking-tight">{partner.id}</p>
+                <p className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 tracking-tight">{partner.displayId}</p>
               </div>
               <Button
                 variant="ghost"
@@ -240,7 +245,7 @@ export function PartnerDialog({
                   >
                     <div>
                       <p className="font-bold text-zinc-800 dark:text-zinc-200">{req.sender.username}</p>
-                      <p className="text-[10px] text-zinc-400 font-mono tracking-tight">{req.sender.id}</p>
+                      <p className="text-[10px] text-zinc-400 font-mono tracking-tight">{req.sender.displayId}</p>
                     </div>
                     <div className="flex gap-1.5 shrink-0">
                       <Button
@@ -282,7 +287,7 @@ export function PartnerDialog({
                   >
                     <div className="grid">
                       <span className="font-medium text-zinc-700 dark:text-zinc-300">درخواست به {req.receiver.username}</span>
-                      <span className="text-[9px] text-zinc-400 font-mono tracking-tight">{req.receiver.id}</span>
+                      <span className="text-[9px] text-zinc-400 font-mono tracking-tight">{req.receiver.displayId}</span>
                     </div>
                     <Button
                       size="sm"

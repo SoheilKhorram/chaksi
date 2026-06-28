@@ -47,11 +47,35 @@ export async function signupAction(formData: FormData): Promise<ActionResponse> 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10)
 
+    // Helper to generate random alphanumeric ID
+    const generateAlphanumericId = (length = 6): string => {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+      let result = ''
+      for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length))
+      }
+      return result
+    }
+
+    // Generate unique displayId
+    let uniqueDisplayId = ''
+    let isUnique = false
+    while (!isUnique) {
+      uniqueDisplayId = generateAlphanumericId(6)
+      const existing = await prisma.user.findUnique({
+        where: { displayId: uniqueDisplayId }
+      })
+      if (!existing) {
+        isUnique = true
+      }
+    }
+
     // Save user to the database
     const user = await prisma.user.create({
       data: {
         username: username.trim(),
-        password: hashedPassword
+        password: hashedPassword,
+        displayId: uniqueDisplayId
       }
     })
 

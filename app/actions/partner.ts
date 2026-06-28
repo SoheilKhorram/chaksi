@@ -22,13 +22,17 @@ export async function sendPartnerRequestAction(
       return { success: false, error: 'کد هم‌تیمی الزامی است.' }
     }
 
-    if (cleanReceiverId === user.id) {
+    if (!/^[A-Za-z0-9]{6}$/.test(cleanReceiverId)) {
+      return { success: false, error: 'کد هم‌تیمی باید یک شناسه ۶ کاراکتری شامل حروف و اعداد باشد.' }
+    }
+
+    if (cleanReceiverId === user.displayId) {
       return { success: false, error: 'شما نمی‌توانید به خودتان درخواست هم‌تیمی بدهید!' }
     }
 
     // Check if receiver user exists
     const receiver = await prisma.user.findUnique({
-      where: { id: cleanReceiverId }
+      where: { displayId: cleanReceiverId }
     })
 
     if (!receiver) {

@@ -8,6 +8,7 @@ generator client {
 
 model User {
   id               String           @id @default(uuid())
+  displayId        String           @unique
   username         String           @unique
   password         String
   avatar           String           @default("cat.png")

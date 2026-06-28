@@ -74,8 +74,8 @@ export default async function Page() {
       ]
     },
     include: {
-      sender: { select: { id: true, username: true } },
-      receiver: { select: { id: true, username: true } }
+      sender: { select: { id: true, username: true, displayId: true } },
+      receiver: { select: { id: true, username: true, displayId: true } }
     }
   })
 
@@ -90,7 +90,7 @@ export default async function Page() {
       status: 'PENDING'
     },
     include: {
-      sender: { select: { id: true, username: true } }
+      sender: { select: { id: true, username: true, displayId: true } }
     }
   })
 
@@ -101,7 +101,7 @@ export default async function Page() {
       status: 'PENDING'
     },
     include: {
-      receiver: { select: { id: true, username: true } }
+      receiver: { select: { id: true, username: true, displayId: true } }
     }
   })
 
@@ -152,7 +152,7 @@ export default async function Page() {
             </Breadcrumb>
           </div>
           <HeaderActions
-            user={{ id: user.id, username: user.username }}
+            user={{ id: user.id, username: user.username, displayId: user.displayId }}
             partner={partner}
             receivedRequests={receivedRequests}
             sentRequests={sentRequests}

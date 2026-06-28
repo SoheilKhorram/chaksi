@@ -9,10 +9,10 @@ import { useState } from "react"
 import { PartnerDialog } from "@/components/partner-dialog"
 
 interface HeaderActionsProps {
-  user?: { id: string; username: string } | null
-  partner?: { id: string; username: string } | null
-  receivedRequests?: Array<{ id: string; sender: { id: string; username: string } }>
-  sentRequests?: Array<{ id: string; receiver: { id: string; username: string } }>
+  user?: { id: string; username: string; displayId: string } | null
+  partner?: { id: string; username: string; displayId: string } | null
+  receivedRequests?: Array<{ id: string; sender: { id: string; username: string; displayId: string } }>
+  sentRequests?: Array<{ id: string; receiver: { id: string; username: string; displayId: string } }>
 }
 
 export function HeaderActions({
@@ -69,7 +69,7 @@ export function HeaderActions({
           <PartnerDialog
             open={showPartnerModal}
             onOpenChange={setShowPartnerModal}
-            userId={user.id}
+            userId={user.displayId}
             partner={partner}
             receivedRequests={receivedRequests}
             sentRequests={sentRequests}
