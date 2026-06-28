@@ -422,3 +422,32 @@ export async function markSessionsPaidInRangeAction(
   }
 }
 
+/**
+ * Marks all unpaid padel sessions as paid for the user.
+ */
+export async function markAllSessionsPaidAction(): Promise<ActionResponse> {
+  try {
+    const user = await getAuthenticatedUser()
+    if (!user) {
+      return { success: false, error: 'عدم دسترسی معتبر.' }
+    }
+
+    await prisma.padelSession.updateMany({
+      where: {
+        userId: user.id,
+        isPaid: false,
+      },
+      data: {
+        isPaid: true,
+      },
+    })
+
+    revalidatePath('/padel')
+    return { success: true }
+  } catch (err) {
+    console.error('Mark all sessions paid error:', err)
+    return { success: false, error: 'ثبت تسویه حساب کامل ناموفق بود.' }
+  }
+}
+
+

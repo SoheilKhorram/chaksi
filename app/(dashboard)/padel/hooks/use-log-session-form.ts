@@ -9,7 +9,7 @@ export function useLogSessionForm(settings: PadelSettings, onSuccess?: () => voi
   // Form State
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())
   const [showDatePicker, setShowDatePicker] = useState(false)
-  const [duration, setDuration] = useState('1.5')
+  const [duration, setDuration] = useState('1.0')
   const [players, setPlayers] = useState('')
   const [type, setType] = useState<'game' | 'training'>('game')
   const [isCustomPrice, setIsCustomPrice] = useState(false)
@@ -115,7 +115,7 @@ export function useLogSessionForm(settings: PadelSettings, onSuccess?: () => voi
   const resetForm = () => {
     setSelectedDate(new Date())
     setShowDatePicker(false)
-    setDuration('1.5')
+    setDuration('1.0')
     setPlayers('')
     setType('game')
     setIsCustomPrice(false)

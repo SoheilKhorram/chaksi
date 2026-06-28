@@ -4,9 +4,11 @@ import { useState, useMemo, useTransition } from 'react'
 import { CalendarIcon, CheckCircle2Icon, Loader2Icon, WalletIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
-import { markSessionsPaidInRangeAction } from '@/app/actions/padel'
+import { markSessionsPaidInRangeAction, markAllSessionsPaidAction } from '@/app/actions/padel'
 import { PadelSession } from '../types'
 import { formatPrice } from '../utils'
+import { ConfirmRangeSettleDialog } from './confirm-range-settle-dialog'
+import { ConfirmAllSettleDialog } from './confirm-all-settle-dialog'
 
 interface BulkSettleCardProps {
   sessions: PadelSession[]
@@ -17,9 +19,36 @@ export function BulkSettleCard({ sessions }: BulkSettleCardProps) {
   const [endDate, setEndDate] = useState<Date | undefined>(undefined)
   const [showStartPicker, setShowStartPicker] = useState(false)
   const [showEndPicker, setShowEndPicker] = useState(false)
-  const [isPending, startTransition] = useTransition()
+  const [isSettlePending, startSettleTransition] = useTransition()
+  const [isSettleAllPending, startSettleAllTransition] = useTransition()
+  const [showConfirmSettle, setShowConfirmSettle] = useState(false)
+  const [showConfirmSettleAll, setShowConfirmSettleAll] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<boolean>(false)
+
+  const totalUnpaidSessionsCount = useMemo(() => {
+    return sessions.filter((session) => !session.isPaid).length
+  }, [sessions])
+
+  const handleSettleAll = () => {
+    setError(null)
+    setSuccess(false)
+
+    startSettleAllTransition(async () => {
+      const res = await markAllSessionsPaidAction()
+
+      if (res.success) {
+        setSuccess(true)
+        setStartDate(undefined)
+        setEndDate(undefined)
+        setShowConfirmSettleAll(false)
+        setTimeout(() => setSuccess(false), 3000)
+      } else {
+        setError(res.error || 'خطا در ثبت تسویه حساب کامل')
+        setShowConfirmSettleAll(false)
+      }
+    })
+  }
 
   // Memoized calculations for selected range
   const unpaidSessionsInRange = useMemo(() => {
@@ -44,7 +73,7 @@ export function BulkSettleCard({ sessions }: BulkSettleCardProps) {
     setError(null)
     setSuccess(false)
 
-    startTransition(async () => {
+    startSettleTransition(async () => {
       const startStr = startDate.toISOString().split('T')[0]
       const endStr = endDate.toISOString().split('T')[0]
       const res = await markSessionsPaidInRangeAction(startStr, endStr)
@@ -53,9 +82,11 @@ export function BulkSettleCard({ sessions }: BulkSettleCardProps) {
         setSuccess(true)
         setStartDate(undefined)
         setEndDate(undefined)
+        setShowConfirmSettle(false)
         setTimeout(() => setSuccess(false), 3000)
       } else {
         setError(res.error || 'خطا در ثبت تسویه حساب')
+        setShowConfirmSettle(false)
       }
     })
   }
@@ -74,7 +105,7 @@ export function BulkSettleCard({ sessions }: BulkSettleCardProps) {
       </div>
 
       <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-5">
-        بازه زمانی مورد نظر خود را انتخاب کنید تا جلسات پرداخت‌نشده آن دوره را به صورت یکجا تسویه کنید.
+        بازه زمانی رو انتخاب کن تا جلسات پرداخت‌نشده این دوره  یکجا تسویه شه
       </p>
 
       {error && (
@@ -92,7 +123,7 @@ export function BulkSettleCard({ sessions }: BulkSettleCardProps) {
 
       <div className="space-y-4">
         {/* Date pickers */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 gap-4">
           {/* Start Date */}
           <div className="relative">
             <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">از تاریخ</label>
@@ -198,21 +229,64 @@ export function BulkSettleCard({ sessions }: BulkSettleCardProps) {
           </div>
         )}
 
-        {/* Action Button */}
-        <Button
-          onClick={handleSettle}
-          disabled={isPending || !startDate || !endDate || unpaidSessionsInRange.length === 0}
-          className="w-full font-bold h-10 shadow-sm"
-        >
-          {isPending ? (
-            <>
-              <Loader2Icon className="me-2 h-4 w-4 animate-spin" /> در حال تسویه...
-            </>
-          ) : (
-            'تسویه جلسات این بازه'
+        {/* Action Buttons Wrapper */}
+        <div className="flex flex-col sm:flex-row w-full gap-3">
+          <Button
+            onClick={() => setShowConfirmSettle(true)}
+            disabled={isSettlePending || isSettleAllPending || !startDate || !endDate || unpaidSessionsInRange.length === 0}
+            className="flex-1 min-h-8 sm:h-10 text-xs sm:text-sm shadow-sm px-4"
+          >
+            {isSettlePending ? (
+              <>
+                <Loader2Icon className="me-2 h-4 w-4 animate-spin" /> در حال تسویه...
+              </>
+            ) : (
+              'تسویه جلسات این بازه'
+            )}
+          </Button>
+
+          {totalUnpaidSessionsCount > 0 && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowConfirmSettleAll(true)}
+              disabled={isSettlePending || isSettleAllPending}
+              className="flex-1 min-h-8 sm:h-10 px-4 text-xs sm:text-sm border-dashed border-emerald-300 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-800/40 dark:text-emerald-400 dark:hover:bg-emerald-500/10"
+            >
+              {isSettleAllPending ? (
+                <>
+                  <Loader2Icon className="me-2 h-4 w-4 animate-spin" /> در حال تسویه...
+                </>
+              ) : (
+                `تسویه کل جلسات تا کنون (${totalUnpaidSessionsCount.toLocaleString('fa-IR')} جلسه)`
+              )}
+            </Button>
           )}
-        </Button>
+        </div>
       </div>
+
+      {/* Confirmation Dialog for Range Settlement */}
+      <ConfirmRangeSettleDialog
+        open={showConfirmSettle}
+        onOpenChange={setShowConfirmSettle}
+        unpaidSessionsCount={unpaidSessionsInRange.length}
+        startDate={startDate}
+        endDate={endDate}
+        totalCost={totalUnpaidCost}
+        onConfirm={handleSettle}
+        isPending={isSettlePending}
+      />
+
+      {/* Confirmation Dialog for All Settlement */}
+      <ConfirmAllSettleDialog
+        open={showConfirmSettleAll}
+        onOpenChange={setShowConfirmSettleAll}
+        totalUnpaidSessionsCount={totalUnpaidSessionsCount}
+        onConfirm={handleSettleAll}
+        isPending={isSettleAllPending}
+      />
     </div>
   )
 }
+
+
