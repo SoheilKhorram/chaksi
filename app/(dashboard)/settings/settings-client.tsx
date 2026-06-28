@@ -10,9 +10,26 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
-import { Eye, EyeOff, SaveIcon, UserIcon, Share2 as Share2Icon } from "lucide-react"
-import { updateUserSettingsAction } from "@/app/actions/user"
+import {
+  Eye,
+  EyeOff,
+  SaveIcon,
+  UserIcon,
+  Share2 as Share2Icon,
+  Camera,
+  Check,
+  Loader2,
+  AlertCircle,
+} from "lucide-react"
+import { updateUserSettingsAction, updateAvatarAction, updateSharingSettingsAction } from "@/app/actions/user"
 import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 interface SettingsClientProps {
   user: {
@@ -51,6 +68,58 @@ export function SettingsClient({ user, padelSettings }: SettingsClientProps) {
   const [success, setSuccess] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
+  // Immediate autosave states
+  const [isSavingAvatar, setIsSavingAvatar] = useState(false)
+  const [isAvatarDialogOpen, setIsAvatarDialogOpen] = useState(false)
+  const [sharingSaveStatus, setSharingSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+
+  async function handleSharingChange(type: 'game' | 'training', checked: boolean) {
+    setSharingSaveStatus('saving')
+    
+    const newSendGame = type === 'game' ? checked : sendGameToPartner
+    const newSendTraining = type === 'training' ? checked : sendTrainingToPartner
+    
+    if (type === 'game') setSendGameToPartner(checked)
+    if (type === 'training') setSendTrainingToPartner(checked)
+    
+    try {
+      const res = await updateSharingSettingsAction(newSendGame, newSendTraining)
+      if (res.success) {
+        setSharingSaveStatus('saved')
+        setTimeout(() => setSharingSaveStatus('idle'), 2500)
+      } else {
+        setSharingSaveStatus('error')
+        // Rollback on failure
+        if (type === 'game') setSendGameToPartner(!checked)
+        if (type === 'training') setSendTrainingToPartner(!checked)
+      }
+    } catch (error) {
+      setSharingSaveStatus('error')
+      // Rollback on failure
+      if (type === 'game') setSendGameToPartner(!checked)
+      if (type === 'training') setSendTrainingToPartner(!checked)
+    }
+  }
+
+  async function handleAvatarSelect(avatarFile: string) {
+    setIsSavingAvatar(true)
+    setError(null)
+    try {
+      const res = await updateAvatarAction(avatarFile)
+      if (res.success) {
+        setSelectedAvatar(avatarFile)
+        setIsAvatarDialogOpen(false)
+        router.refresh()
+      } else {
+        setError(res.error || "خطایی در تغییر آواتار رخ داد.")
+      }
+    } catch (error) {
+      setError("خطایی در ارتباط با سرور رخ داد.")
+    } finally {
+      setIsSavingAvatar(false)
+    }
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setIsLoading(true)
@@ -58,10 +127,8 @@ export function SettingsClient({ user, padelSettings }: SettingsClientProps) {
     setSuccess(null)
 
     const formData = new FormData(event.currentTarget)
-    // Append the selected avatar and sharing settings
+    // Append the selected avatar (still required by action)
     formData.set("avatar", selectedAvatar)
-    formData.set("sendGameToPartner", sendGameToPartner ? "on" : "off")
-    formData.set("sendTrainingToPartner", sendTrainingToPartner ? "on" : "off")
 
     try {
       const res = await updateUserSettingsAction(formData)
@@ -92,27 +159,94 @@ export function SettingsClient({ user, padelSettings }: SettingsClientProps) {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Right side - Form details (1 column) */}
-        <div className="lg:col-span-1 flex flex-col gap-6 h-fit">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Right side - User details (2 columns) */}
+        <div className="lg:col-span-2 flex flex-col gap-6">
           {/* Card 1: User Profile Settings */}
-          <div className="flex flex-col gap-6 bg-card border border-border rounded-2xl p-6 shadow-sm">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6 bg-card border border-border rounded-2xl p-6 shadow-sm">
             <h2 className="text-lg font-semibold border-b pb-3 flex items-center gap-2">
               <UserIcon className="size-5 text-primary" />
               <span>اطلاعات کاربری</span>
             </h2>
 
             {/* Dynamic Avatar Preview */}
-            <div className="flex flex-col items-center justify-center py-4 bg-muted/30 rounded-xl border border-dashed border-border">
-              <div className="relative size-24 rounded-2xl overflow-hidden border-2 border-primary shadow-lg bg-background transition-transform duration-300 hover:scale-105 hover:rotate-2">
-                <img
-                  src={`/avatars/${selectedAvatar}`}
-                  alt="Profile Preview"
-                  className="size-full object-cover"
-                />
-              </div>
-              <span className="mt-3 text-sm font-medium">{user.username}</span>
-              <span className="text-xs text-muted-foreground mt-1">پیش‌نمایش نمایه کاربری</span>
+            <div className="flex flex-col items-center justify-center py-6 bg-muted/20 rounded-2xl border border-border/80 relative overflow-hidden group/avatar-card">
+              <div className="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-primary/5 to-transparent" />
+              
+              <Dialog open={isAvatarDialogOpen} onOpenChange={setIsAvatarDialogOpen}>
+                <DialogTrigger asChild>
+                  <button
+                    type="button"
+                    className="relative size-24 rounded-full overflow-hidden border-4 border-background shadow-md bg-background cursor-pointer group transition-all duration-300 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 z-10 animate-fade-in"
+                    title="تغییر آواتار"
+                  >
+                    <img
+                      src={`/avatars/${selectedAvatar}`}
+                      alt="Profile Preview"
+                      className="size-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-1 text-white">
+                      <Camera className="size-5" />
+                      <span className="text-[10px] font-semibold">تغییر آواتار</span>
+                    </div>
+                  </button>
+                </DialogTrigger>
+                
+                <DialogContent className="max-w-md sm:rounded-2xl p-6">
+                  <DialogHeader className="mb-4">
+                    <DialogTitle className="text-lg font-bold text-start">انتخاب آواتار کاربری</DialogTitle>
+                    <p className="text-xs text-muted-foreground text-start">
+                      یکی از آواتارهای حیوانات زیر را برای نمایه کاربری خود انتخاب کنید. آواتار به صورت خودکار ذخیره خواهد شد.
+                    </p>
+                  </DialogHeader>
+                  
+                  {isSavingAvatar && (
+                    <div className="absolute inset-0 bg-background/80 backdrop-blur-xs z-50 flex items-center justify-center flex-col gap-2 rounded-2xl">
+                      <Loader2 className="size-8 animate-spin text-primary" />
+                      <span className="text-sm font-semibold">در حال به‌روزرسانی آواتار...</span>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-4 gap-3 max-h-[350px] overflow-y-auto p-1">
+                    {AVATARS.map((avatar) => {
+                      const isSelected = selectedAvatar === avatar.file
+                      return (
+                        <button
+                          key={avatar.file}
+                          type="button"
+                          onClick={() => handleAvatarSelect(avatar.file)}
+                          className={cn(
+                            "flex flex-col items-center justify-center p-2 rounded-xl border cursor-pointer transition-all duration-200",
+                            "hover:scale-105 active:scale-95 group/avatar-btn",
+                            isSelected
+                              ? "border-primary bg-primary/5 ring-1 ring-primary"
+                              : "border-border hover:border-zinc-400 hover:bg-muted/50"
+                          )}
+                        >
+                          <div className="size-12 rounded-lg overflow-hidden bg-background border border-border flex items-center justify-center p-1 group-hover/avatar-btn:rotate-3 transition-transform">
+                            <img
+                              src={`/avatars/${avatar.file}`}
+                              alt={avatar.name}
+                              className="size-full object-contain"
+                            />
+                          </div>
+                          <span
+                            className={cn(
+                              "mt-1 text-[10px] font-semibold truncate w-full text-center",
+                              isSelected ? "text-primary font-bold" : "text-muted-foreground"
+                            )}
+                          >
+                            {avatar.name}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              <span className="mt-3 text-base font-bold text-zinc-950 dark:text-zinc-50 z-10">{user.username}</span>
+              <span className="text-xs text-muted-foreground mt-0.5 z-10">پیش‌نمایش نمایه کاربری</span>
             </div>
 
             {error && (
@@ -156,7 +290,7 @@ export function SettingsClient({ user, padelSettings }: SettingsClientProps) {
                     variant="ghost"
                     size="icon-xs"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute end-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:bg-transparent"
+                    className="absolute end-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:bg-transparent animate-fade-in"
                     aria-label={showPassword ? "پنهان کردن رمز" : "نمایش رمز"}
                   >
                     {showPassword ? (
@@ -183,7 +317,7 @@ export function SettingsClient({ user, padelSettings }: SettingsClientProps) {
                     variant="ghost"
                     size="icon-xs"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute end-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:bg-transparent"
+                    className="absolute end-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:bg-transparent animate-fade-in"
                     aria-label={showConfirmPassword ? "پنهان کردن رمز" : "نمایش رمز"}
                   >
                     {showConfirmPassword ? (
@@ -198,24 +332,50 @@ export function SettingsClient({ user, padelSettings }: SettingsClientProps) {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full mt-2 h-10 text-sm flex items-center justify-center gap-2 cursor-pointer transition-transform duration-200 active:scale-[0.98]"
+                className="w-full mt-2 h-10 text-sm flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 active:scale-[0.98]"
               >
                 <SaveIcon className="size-4" />
                 <span>{isLoading ? "در حال ذخیره‌سازی..." : "ذخیره تغییرات"}</span>
               </Button>
             </FieldGroup>
-          </div>
+          </form>
+        </div>
 
-          {/* Card 2: Session Sharing Settings */}
-          <div className="flex flex-col gap-6 bg-card border border-border rounded-2xl p-6 shadow-sm">
-            <h2 className="text-lg font-semibold border-b pb-3 flex items-center gap-2">
-              <Share2Icon className="size-5 text-primary" />
-              <span>تنظیمات اشتراک‌گذاری جلسه</span>
+        {/* Left side - Session Sharing Settings (1 column) */}
+        <div className="lg:col-span-1 flex flex-col gap-6">
+          <div className="flex flex-col gap-6 bg-card border border-border rounded-2xl p-6 shadow-sm h-fit">
+            <h2 className="text-lg font-semibold border-b pb-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Share2Icon className="size-5 text-primary" />
+                <span>اشتراک‌گذاری جلسه</span>
+              </div>
+              
+              {/* Saving status indicator */}
+              <div className="flex items-center text-xs min-h-[24px]">
+                {sharingSaveStatus === 'saving' && (
+                  <span className="flex items-center gap-1 text-muted-foreground animate-pulse">
+                    <Loader2 className="size-3.5 animate-spin" />
+                    <span>در حال ذخیره...</span>
+                  </span>
+                )}
+                {sharingSaveStatus === 'saved' && (
+                  <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-500/10 dark:bg-emerald-500/25 px-2 py-0.5 rounded-full transition-opacity duration-350">
+                    <Check className="size-3.5" />
+                    <span>ذخیره شد</span>
+                  </span>
+                )}
+                {sharingSaveStatus === 'error' && (
+                  <span className="flex items-center gap-1 text-destructive font-semibold bg-destructive/10 px-2 py-0.5 rounded-full">
+                    <AlertCircle className="size-3.5" />
+                    <span>خطا</span>
+                  </span>
+                )}
+              </div>
             </h2>
 
             <div className="flex flex-col gap-4">
               <p className="text-xs text-muted-foreground leading-relaxed">
-                با فعال‌سازی هر مورد، هنگام ثبت جلسه جدید، گزینه ارسال به هم‌تیمی به صورت پیش‌فرض فعال خواهد بود.
+                با فعال‌سازی هر مورد، هنگام ثبت جلسه جدید، گزینه ارسال به هم‌تیمی به صورت پیش‌فرض فعال خواهد بود. تنظیمات بلافاصله ذخیره می‌شوند.
               </p>
 
               <div className="flex items-center justify-between border border-border rounded-xl p-3 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors">
@@ -226,7 +386,7 @@ export function SettingsClient({ user, padelSettings }: SettingsClientProps) {
                 <Checkbox
                   id="sendGameToPartner"
                   checked={sendGameToPartner}
-                  onCheckedChange={(checked) => setSendGameToPartner(!!checked)}
+                  onCheckedChange={(checked) => handleSharingChange('game', !!checked)}
                 />
               </div>
 
@@ -238,59 +398,13 @@ export function SettingsClient({ user, padelSettings }: SettingsClientProps) {
                 <Checkbox
                   id="sendTrainingToPartner"
                   checked={sendTrainingToPartner}
-                  onCheckedChange={(checked) => setSendTrainingToPartner(!!checked)}
+                  onCheckedChange={(checked) => handleSharingChange('training', !!checked)}
                 />
               </div>
             </div>
           </div>
         </div>
-
-        {/* Left side - Avatar grid selection (2 columns) */}
-        <div className="lg:col-span-2 flex flex-col gap-6 bg-card border border-border rounded-2xl p-6 shadow-sm">
-          <div className="border-b pb-3 flex flex-col gap-1">
-            <h2 className="text-lg font-semibold">انتخاب آواتار نمایه</h2>
-            <p className="text-xs text-muted-foreground">
-              یکی از آواتارهای حیوانات زیر را برای نمایه کاربری خود انتخاب کنید:
-            </p>
-          </div>
-
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-4 mt-2">
-            {AVATARS.map((avatar) => {
-              const isSelected = selectedAvatar === avatar.file
-              return (
-                <button
-                  key={avatar.file}
-                  type="button"
-                  onClick={() => setSelectedAvatar(avatar.file)}
-                  className={cn(
-                    "flex flex-col items-center justify-center p-3 rounded-2xl border-2 cursor-pointer transition-all duration-300",
-                    "hover:scale-105 active:scale-95 group",
-                    isSelected
-                      ? "border-primary bg-primary/5 ring-1 ring-primary"
-                      : "border-border hover:border-muted-foreground/30 hover:bg-accent/40"
-                  )}
-                >
-                  <div className="size-16 rounded-xl overflow-hidden bg-background border border-border flex items-center justify-center p-1 group-hover:rotate-3 transition-transform">
-                    <img
-                      src={`/avatars/${avatar.file}`}
-                      alt={avatar.name}
-                      className="size-full object-contain"
-                    />
-                  </div>
-                  <span
-                    className={cn(
-                      "mt-2 text-xs font-semibold tracking-wide",
-                      isSelected ? "text-primary" : "text-muted-foreground"
-                    )}
-                  >
-                    {avatar.name}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      </form>
+      </div>
     </div>
   )
 }

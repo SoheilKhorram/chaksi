@@ -139,3 +139,63 @@ export async function updateUserSettingsAction(formData: FormData): Promise<Acti
     return { success: false, error: 'یک خطای غیرمنتظره در حین ذخیره تنظیمات رخ داد.' }
   }
 }
+
+/**
+ * Server Action to update only the user's avatar
+ */
+export async function updateAvatarAction(avatar: string): Promise<ActionResponse> {
+  try {
+    const currentUser = await getAuthenticatedUser()
+    if (!currentUser) {
+      return { success: false, error: 'کاربر احراز هویت نشده است. لطفاً دوباره وارد شوید.' }
+    }
+
+    if (!avatar || !VALID_AVATARS.includes(avatar)) {
+      return { success: false, error: 'آواتار انتخاب شده نامعتبر است.' }
+    }
+
+    await prisma.user.update({
+      where: { id: currentUser.id },
+      data: { avatar },
+    })
+
+    return { success: true }
+  } catch (error) {
+    console.error('Update avatar error:', error)
+    return { success: false, error: 'یک خطای غیرمنتظره در به‌روزرسانی آواتار رخ داد.' }
+  }
+}
+
+/**
+ * Server Action to update user sharing settings defaults
+ */
+export async function updateSharingSettingsAction(
+  sendGameToPartner: boolean,
+  sendTrainingToPartner: boolean
+): Promise<ActionResponse> {
+  try {
+    const currentUser = await getAuthenticatedUser()
+    if (!currentUser) {
+      return { success: false, error: 'کاربر احراز هویت نشده است. لطفاً دوباره وارد شوید.' }
+    }
+
+    await prisma.padelSettings.upsert({
+      where: { userId: currentUser.id },
+      update: {
+        sendGameToPartner,
+        sendTrainingToPartner,
+      },
+      create: {
+        userId: currentUser.id,
+        sendGameToPartner,
+        sendTrainingToPartner,
+      },
+    })
+
+    return { success: true }
+  } catch (error) {
+    console.error('Update sharing settings error:', error)
+    return { success: false, error: 'یک خطای غیرمنتظره در به‌روزرسانی تنظیمات اشتراک‌گذاری رخ داد.' }
+  }
+}
+
