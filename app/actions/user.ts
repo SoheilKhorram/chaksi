@@ -94,6 +94,27 @@ export async function updateUserSettingsAction(formData: FormData): Promise<Acti
       data: updateData,
     })
 
+    // Update padel settings defaults for session sharing if present in formData
+    const sendGameToPartnerRaw = formData.get('sendGameToPartner')
+    const sendTrainingToPartnerRaw = formData.get('sendTrainingToPartner')
+    if (sendGameToPartnerRaw !== null && sendTrainingToPartnerRaw !== null) {
+      const sendGameToPartner = sendGameToPartnerRaw === 'on'
+      const sendTrainingToPartner = sendTrainingToPartnerRaw === 'on'
+
+      await prisma.padelSettings.upsert({
+        where: { userId: currentUser.id },
+        update: {
+          sendGameToPartner,
+          sendTrainingToPartner,
+        },
+        create: {
+          userId: currentUser.id,
+          sendGameToPartner,
+          sendTrainingToPartner,
+        },
+      })
+    }
+
     // 7. Re-sign session JWT with updated username and save cookie if username changed
     if (cleanUsername !== currentUser.username) {
       const token = await signJWT({

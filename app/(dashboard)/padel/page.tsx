@@ -61,8 +61,18 @@ export default async function Page() {
   }
 
   const defaultSettings = settings
-    ? { gamePrice: settings.gamePrice, trainingPrice: settings.trainingPrice }
-    : { gamePrice: 250000, trainingPrice: 800000 }
+    ? {
+        gamePrice: settings.gamePrice,
+        trainingPrice: settings.trainingPrice,
+        sendGameToPartner: settings.sendGameToPartner,
+        sendTrainingToPartner: settings.sendTrainingToPartner,
+      }
+    : {
+        gamePrice: 250000,
+        trainingPrice: 800000,
+        sendGameToPartner: false,
+        sendTrainingToPartner: false,
+      }
 
   // Fetch active partner connection
   const activePartnership = await prisma.partnerRequest.findFirst({

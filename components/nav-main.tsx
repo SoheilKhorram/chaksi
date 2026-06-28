@@ -34,7 +34,7 @@ export function NavMain({
   return (
     <SidebarGroup>
       <SidebarGroupLabel>پلتفرم</SidebarGroupLabel>
-      <SidebarMenu>
+      <SidebarMenu className="flex flex-col gap-2">
         {items.map((item) => {
           if (!item.items || item.items.length === 0) {
             return (

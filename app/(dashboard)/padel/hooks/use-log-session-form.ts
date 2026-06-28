@@ -15,9 +15,14 @@ export function useLogSessionForm(settings: PadelSettings, onSuccess?: () => voi
   const [isCustomPrice, setIsCustomPrice] = useState(false)
   const [customPrice, setCustomPrice] = useState('')
   const [extraItems, setExtraItems] = useState<ExtraItemForm[]>([])
-  const [sendToPartner, setSendToPartner] = useState(false)
+  const [sendToPartner, setSendToPartner] = useState(settings.sendGameToPartner ?? false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<boolean>(false)
+
+  const handleTypeChange = (newType: 'game' | 'training') => {
+    setType(newType)
+    setSendToPartner(newType === 'game' ? !!settings.sendGameToPartner : !!settings.sendTrainingToPartner)
+  }
 
   const handleCustomPriceChange = (val: string) => {
     setCustomPrice(formatInputNumber(val))
@@ -114,7 +119,7 @@ export function useLogSessionForm(settings: PadelSettings, onSuccess?: () => voi
     setIsCustomPrice(false)
     setCustomPrice('')
     setExtraItems([])
-    setSendToPartner(false)
+    setSendToPartner(settings.sendGameToPartner ?? false)
     setError(null)
     setSuccess(false)
   }
@@ -129,7 +134,7 @@ export function useLogSessionForm(settings: PadelSettings, onSuccess?: () => voi
     players,
     setPlayers,
     type,
-    setType,
+    setType: handleTypeChange,
     isCustomPrice,
     setIsCustomPrice,
     customPrice,

@@ -15,6 +15,8 @@ export interface PadelSession {
 export interface PadelSettings {
   gamePrice: number
   trainingPrice: number
+  sendGameToPartner: boolean
+  sendTrainingToPartner: boolean
 }
 
 export interface ExtraItemForm {

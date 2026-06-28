@@ -24,6 +24,11 @@ export default async function Page() {
     redirect("/login")
   }
 
+  // Fetch padel settings
+  const padelSettings = await prisma.padelSettings.findUnique({
+    where: { userId: user.id }
+  })
+
   // Fetch active partner connection
   const activePartnership = await prisma.partnerRequest.findFirst({
     where: {
@@ -75,6 +80,11 @@ export default async function Page() {
     avatar: user.avatar || 'cat.png',
   }
 
+  const serializedPadelSettings = {
+    sendGameToPartner: padelSettings?.sendGameToPartner ?? false,
+    sendTrainingToPartner: padelSettings?.sendTrainingToPartner ?? false,
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar user={sidebarUser} partner={partner} />
@@ -102,7 +112,7 @@ export default async function Page() {
           />
         </header>
         <div className="flex flex-1 flex-col gap-6 p-6 overflow-y-auto">
-          <SettingsClient user={serializedUser} />
+          <SettingsClient user={serializedUser} padelSettings={serializedPadelSettings} />
         </div>
       </SidebarInset>
     </SidebarProvider>
