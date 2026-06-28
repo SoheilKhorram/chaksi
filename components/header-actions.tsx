@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { logoutAction } from "@/app/actions/auth"
 import { useState } from "react"
 import { PartnerDialog } from "@/components/partner-dialog"
+import { LogoutDialog } from "@/components/logout-dialog"
 
 interface HeaderActionsProps {
   user?: { id: string; username: string; displayId: string } | null
@@ -24,6 +25,7 @@ export function HeaderActions({
   const router = useRouter()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [showPartnerModal, setShowPartnerModal] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
   async function handleLogout() {
     if (isLoggingOut) return
@@ -38,6 +40,7 @@ export function HeaderActions({
       console.error("Logout failed:", error)
     } finally {
       setIsLoggingOut(false)
+      setShowLogoutConfirm(false)
     }
   }
 
@@ -80,7 +83,7 @@ export function HeaderActions({
       <Button
         variant="ghost"
         size="icon"
-        onClick={handleLogout}
+        onClick={() => setShowLogoutConfirm(true)}
         disabled={isLoggingOut}
         className="rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
         title="خروج از حساب کاربری"
@@ -88,6 +91,13 @@ export function HeaderActions({
       >
         <LogOutIcon className="size-[1.2rem]" />
       </Button>
+
+      <LogoutDialog
+        open={showLogoutConfirm}
+        onOpenChange={setShowLogoutConfirm}
+        onConfirm={handleLogout}
+        isPending={isLoggingOut}
+      />
     </div>
   )
 }

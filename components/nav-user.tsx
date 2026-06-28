@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { useState } from "react"
 import {
   Avatar,
   AvatarFallback,
@@ -23,6 +24,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { ChevronsUpDownIcon, LogOutIcon, SettingsIcon } from "lucide-react"
 import { logoutAction } from "@/app/actions/auth"
+import { LogoutDialog } from "@/components/logout-dialog"
 
 export function NavUser({
   user,
@@ -35,12 +37,23 @@ export function NavUser({
 }) {
   const router = useRouter()
   const { isMobile } = useSidebar()
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   async function handleLogout() {
-    const res = await logoutAction()
-    if (res.success) {
-      router.push("/login")
-      router.refresh()
+    if (isLoggingOut) return
+    setIsLoggingOut(true)
+    try {
+      const res = await logoutAction()
+      if (res.success) {
+        router.push("/login")
+        router.refresh()
+      }
+    } catch (error) {
+      console.error("Logout failed:", error)
+    } finally {
+      setIsLoggingOut(false)
+      setShowLogoutConfirm(false)
     }
   }
 
@@ -111,13 +124,19 @@ export function NavUser({
               تنظیمات کاربری
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
+            <DropdownMenuItem onClick={() => setShowLogoutConfirm(true)}>
               <LogOutIcon />
               خروج از حساب
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
+      <LogoutDialog
+        open={showLogoutConfirm}
+        onOpenChange={setShowLogoutConfirm}
+        onConfirm={handleLogout}
+        isPending={isLoggingOut}
+      />
     </SidebarMenu>
   )
 }
