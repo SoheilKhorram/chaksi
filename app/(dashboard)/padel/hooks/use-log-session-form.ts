@@ -16,6 +16,7 @@ export function useLogSessionForm(settings: PadelSettings, onSuccess?: () => voi
   const [customPrice, setCustomPrice] = useState('')
   const [extraItems, setExtraItems] = useState<ExtraItemForm[]>([])
   const [sendToPartner, setSendToPartner] = useState(settings.sendGameToPartner ?? false)
+  const [isPaid, setIsPaid] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<boolean>(false)
 
@@ -88,7 +89,8 @@ export function useLogSessionForm(settings: PadelSettings, onSuccess?: () => voi
         type,
         customPrice: isCustomPrice ? parseInputNumber(customPrice) : null,
         extraItems: extras,
-        sendToPartner
+        sendToPartner,
+        isPaid
       })
 
       if (res.success) {
@@ -120,6 +122,7 @@ export function useLogSessionForm(settings: PadelSettings, onSuccess?: () => voi
     setCustomPrice('')
     setExtraItems([])
     setSendToPartner(settings.sendGameToPartner ?? false)
+    setIsPaid(false)
     setError(null)
     setSuccess(false)
   }
@@ -152,6 +155,8 @@ export function useLogSessionForm(settings: PadelSettings, onSuccess?: () => voi
     isPending,
     resetForm,
     sendToPartner,
-    setSendToPartner
+    setSendToPartner,
+    isPaid,
+    setIsPaid
   }
 }

@@ -31,6 +31,7 @@ export function useEditSessionForm(
       price: item.price.toString()
     }))
   )
+  const [isPaid, setIsPaid] = useState(session.isPaid)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<boolean>(false)
 
@@ -97,7 +98,8 @@ export function useEditSessionForm(
         players: players,
         type,
         customPrice: isCustomPrice ? parseInputNumber(customPrice) : null,
-        extraItems: extras
+        extraItems: extras,
+        isPaid
       })
 
       if (res.success) {
@@ -139,6 +141,8 @@ export function useEditSessionForm(
     removeExtraItemRow,
     updateExtraItem,
     onSubmit,
-    isPending
+    isPending,
+    isPaid,
+    setIsPaid
   }
 }

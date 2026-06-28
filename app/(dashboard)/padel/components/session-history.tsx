@@ -6,10 +6,11 @@ interface SessionHistoryProps {
   sessions: PadelSession[]
   onEdit: (session: PadelSession) => void
   onDelete: (id: string) => void
+  onTogglePaid: (id: string) => void
   isPending?: boolean
 }
 
-export function SessionHistory({ sessions, onEdit, onDelete, isPending = false }: SessionHistoryProps) {
+export function SessionHistory({ sessions, onEdit, onDelete, onTogglePaid, isPending = false }: SessionHistoryProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -37,6 +38,7 @@ export function SessionHistory({ sessions, onEdit, onDelete, isPending = false }
               session={session}
               onEdit={onEdit}
               onDelete={onDelete}
+              onTogglePaid={onTogglePaid}
               isPending={isPending}
             />
           ))}

@@ -8,6 +8,7 @@ export interface PadelSession {
   price: number
   extraItems: { name: string; price: number }[]
   totalCost: number
+  isPaid: boolean
   createdAt: string
   updatedAt: string
 }

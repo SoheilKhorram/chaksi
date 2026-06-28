@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { Settings2Icon, PlusIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { PadelSession, PadelSettings, SharedSession } from './types'
@@ -13,6 +13,8 @@ import { EditSessionDialog } from './components/edit-session-dialog'
 import { DeleteConfirmDialog } from './components/delete-confirm-dialog'
 import { SessionFilters } from './components/session-filters'
 import { SharedSessionsList } from './components/shared-sessions-list'
+import { BulkSettleCard } from './components/bulk-settle-card'
+import { togglePadelSessionPaidAction } from '@/app/actions/padel'
 
 interface PadelClientProps {
   initialSettings: PadelSettings
@@ -40,17 +42,32 @@ export function PadelClient({
   // Filter states
   const [playersFilter, setPlayersFilter] = useState('')
   const [typeFilter, setTypeFilter] = useState<'all' | 'game' | 'training'>('all')
+  const [paymentFilter, setPaymentFilter] = useState<'all' | 'paid' | 'unpaid'>('unpaid')
   const [fromDate, setFromDate] = useState<Date | undefined>(undefined)
   const [toDate, setToDate] = useState<Date | undefined>(undefined)
+
+  const [isPending, startTransition] = useTransition()
+
+  const handleTogglePaid = (sessionId: string) => {
+    startTransition(async () => {
+      await togglePadelSessionPaidAction(sessionId)
+    })
+  }
 
   const handleClearFilters = () => {
     setPlayersFilter('')
     setTypeFilter('all')
+    setPaymentFilter('all')
     setFromDate(undefined)
     setToDate(undefined)
   }
 
-  const hasActiveFilters = playersFilter !== '' || typeFilter !== 'all' || fromDate !== undefined || toDate !== undefined
+  const hasActiveFilters =
+    playersFilter !== '' ||
+    typeFilter !== 'all' ||
+    paymentFilter !== 'all' ||
+    fromDate !== undefined ||
+    toDate !== undefined
 
   // Filtered sessions
   const filteredSessions = initialSessions.filter((session) => {
@@ -64,6 +81,14 @@ export function PadelClient({
     // 2. Filter by type
     if (typeFilter !== 'all') {
       if (session.type !== typeFilter) {
+        return false
+      }
+    }
+
+    // 2.5 Filter by payment status
+    if (paymentFilter !== 'all') {
+      const wantPaid = paymentFilter === 'paid'
+      if (session.isPaid !== wantPaid) {
         return false
       }
     }
@@ -123,12 +148,17 @@ export function PadelClient({
       {/* Shared Sessions List */}
       <SharedSessionsList sharedSessions={initialSharedSessions} />
 
+      {/* Dynamic Settle Section */}
+      <BulkSettleCard sessions={initialSessions} />
+
       {/* Session Filters */}
       <SessionFilters
         playersFilter={playersFilter}
         setPlayersFilter={setPlayersFilter}
         typeFilter={typeFilter}
         setTypeFilter={setTypeFilter}
+        paymentFilter={paymentFilter}
+        setPaymentFilter={setPaymentFilter}
         fromDate={fromDate}
         setFromDate={setFromDate}
         toDate={toDate}
@@ -148,6 +178,8 @@ export function PadelClient({
           setSessionIdToDelete(id)
           setShowDeleteConfirmModal(true)
         }}
+        onTogglePaid={handleTogglePaid}
+        isPending={isPending}
       />
 
       {/* Settings Modal */}

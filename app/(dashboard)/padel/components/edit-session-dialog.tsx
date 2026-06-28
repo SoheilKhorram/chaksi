@@ -48,7 +48,9 @@ export function EditSessionDialog({ open, onOpenChange, session, settings }: Edi
     removeExtraItemRow,
     updateExtraItem,
     onSubmit,
-    isPending
+    isPending,
+    isPaid,
+    setIsPaid
   } = useEditSessionForm(session, settings, () => onOpenChange(false))
 
   return (
@@ -210,6 +212,18 @@ export function EditSessionDialog({ open, onOpenChange, session, settings }: Edi
                 />
               </div>
             )}
+          </div>
+
+          {/* Payment Status Option */}
+          <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 pt-3">
+            <Label htmlFor="edit-is-paid" className="cursor-pointer text-sm">
+              تسویه شده / پرداخت شده است؟
+            </Label>
+            <Checkbox
+              id="edit-is-paid"
+              checked={isPaid}
+              onCheckedChange={(checked) => setIsPaid(!!checked)}
+            />
           </div>
 
           {/* Extra Items List */}

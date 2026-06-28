@@ -27,10 +27,10 @@ const teams = [
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   user?: {
-    name: string;
-    avatar?: string;
-  };
-  partner?: { id: string; username: string } | null;
+    name: string
+    avatar?: string
+  }
+  partner?: { id: string; username: string } | null
 }
 
 export function AppSidebar({ user, partner = null, ...props }: AppSidebarProps) {

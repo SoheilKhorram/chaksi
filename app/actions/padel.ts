@@ -18,6 +18,7 @@ export interface PadelSessionInput {
   customPrice?: number | null
   extraItems: ExtraItem[]
   sendToPartner?: boolean
+  isPaid?: boolean
 }
 
 /**
@@ -101,6 +102,7 @@ export async function createPadelSessionAction(
         price: basePrice,
         extraItems: extraItems as any, // Cast as prisma Json
         totalCost: totalCost,
+        isPaid: input.isPaid ?? false,
       },
     })
 
@@ -243,6 +245,7 @@ export async function updatePadelSessionAction(
         price: basePrice,
         extraItems: extraItems as any, // Cast as prisma Json
         totalCost: totalCost,
+        isPaid: input.isPaid,
       },
     })
 
@@ -337,6 +340,85 @@ export async function declineSharedSessionAction(
   } catch (err) {
     console.error('Decline shared session error:', err)
     return { success: false, error: 'رد درخواست جلسه ناموفق بود.' }
+  }
+}
+
+/**
+ * Toggles the paid status of a padel session.
+ */
+export async function togglePadelSessionPaidAction(
+  sessionId: string
+): Promise<ActionResponse> {
+  try {
+    const user = await getAuthenticatedUser()
+    if (!user) {
+      return { success: false, error: 'عدم دسترسی معتبر.' }
+    }
+
+    const session = await prisma.padelSession.findUnique({
+      where: { id: sessionId },
+    })
+
+    if (!session || session.userId !== user.id) {
+      return { success: false, error: 'جلسه یافت نشد یا دسترسی رد شد.' }
+    }
+
+    await prisma.padelSession.update({
+      where: { id: sessionId },
+      data: {
+        isPaid: !session.isPaid,
+      },
+    })
+
+    revalidatePath('/padel')
+    return { success: true }
+  } catch (err) {
+    console.error('Toggle paid status error:', err)
+    return { success: false, error: 'تغییر وضعیت پرداخت ناموفق بود.' }
+  }
+}
+
+/**
+ * Marks padel sessions within a date range as paid.
+ */
+export async function markSessionsPaidInRangeAction(
+  startDateStr: string,
+  endDateStr: string
+): Promise<ActionResponse> {
+  try {
+    const user = await getAuthenticatedUser()
+    if (!user) {
+      return { success: false, error: 'عدم دسترسی معتبر.' }
+    }
+
+    if (!startDateStr || !endDateStr) {
+      return { success: false, error: 'تاریخ شروع و پایان الزامی است.' }
+    }
+
+    const startDate = new Date(startDateStr)
+    startDate.setHours(0, 0, 0, 0)
+    const endDate = new Date(endDateStr)
+    endDate.setHours(23, 59, 59, 999)
+
+    await prisma.padelSession.updateMany({
+      where: {
+        userId: user.id,
+        date: {
+          gte: startDate,
+          lte: endDate,
+        },
+        isPaid: false,
+      },
+      data: {
+        isPaid: true,
+      },
+    })
+
+    revalidatePath('/padel')
+    return { success: true }
+  } catch (err) {
+    console.error('Bulk mark sessions paid error:', err)
+    return { success: false, error: 'ثبت تسویه حساب ناموفق بود.' }
   }
 }
 

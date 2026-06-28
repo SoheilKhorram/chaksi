@@ -46,6 +46,7 @@ model PadelSession {
   price      Float    // Price of this session itself
   extraItems Json     // Array of { name: string, price: number }
   totalCost  Float    // Price + sum of extraItems price
+  isPaid     Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }

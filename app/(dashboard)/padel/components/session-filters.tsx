@@ -11,6 +11,8 @@ interface SessionFiltersProps {
   setPlayersFilter: (val: string) => void
   typeFilter: 'all' | 'game' | 'training'
   setTypeFilter: (val: 'all' | 'game' | 'training') => void
+  paymentFilter: 'all' | 'paid' | 'unpaid'
+  setPaymentFilter: (val: 'all' | 'paid' | 'unpaid') => void
   fromDate: Date | undefined
   setFromDate: (date: Date | undefined) => void
   toDate: Date | undefined
@@ -24,6 +26,8 @@ export function SessionFilters({
   setPlayersFilter,
   typeFilter,
   setTypeFilter,
+  paymentFilter,
+  setPaymentFilter,
   fromDate,
   setFromDate,
   toDate,
@@ -45,7 +49,7 @@ export function SessionFilters({
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
         {/* Search Players */}
-        <div className="space-y-1.5 md:col-span-4">
+        <div className="space-y-1.5 md:col-span-3">
           <label htmlFor="players-search" className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
             جستجوی بازیکنان / هم‌بازی‌ها
           </label>
@@ -57,7 +61,7 @@ export function SessionFilters({
               placeholder="مثال: علی، رضا..."
               value={playersFilter}
               onChange={(e) => setPlayersFilter(e.target.value)}
-              className="ps-9 h-9"
+              className="ps-9 h-9 text-xs"
             />
             {playersFilter && (
               <button
@@ -71,9 +75,9 @@ export function SessionFilters({
         </div>
 
         {/* Session Type */}
-        <div className="space-y-1.5 md:col-span-3">
+        <div className="space-y-1.5 md:col-span-2">
           <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">نوع جلسه</label>
-          <div className="grid grid-cols-3 gap-1 p-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 h-9 items-center">
+          <div className="grid grid-cols-3 gap-0.5 p-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 h-9 items-center">
             <button
               type="button"
               onClick={() => setTypeFilter('all')}
@@ -107,8 +111,45 @@ export function SessionFilters({
           </div>
         </div>
 
+        {/* Payment Status */}
+        <div className="space-y-1.5 md:col-span-3">
+          <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">وضعیت پرداخت</label>
+          <div className="grid grid-cols-3 gap-0.5 p-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 h-9 items-center">
+            <button
+              type="button"
+              onClick={() => setPaymentFilter('all')}
+              className={`py-1 text-xs font-semibold rounded-md transition-all h-7
+                ${paymentFilter === 'all'
+                  ? 'bg-white text-zinc-900 shadow-xs dark:bg-zinc-900 dark:text-zinc-50'
+                  : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400'}`}
+            >
+              همه
+            </button>
+            <button
+              type="button"
+              onClick={() => setPaymentFilter('paid')}
+              className={`py-1 text-xs font-semibold rounded-md transition-all h-7
+                ${paymentFilter === 'paid'
+                  ? 'bg-white text-emerald-600 shadow-xs dark:bg-zinc-900 dark:text-emerald-400'
+                  : 'text-zinc-500 hover:text-emerald-500 dark:text-zinc-400'}`}
+            >
+              تسویه
+            </button>
+            <button
+              type="button"
+              onClick={() => setPaymentFilter('unpaid')}
+              className={`py-1 text-xs font-semibold rounded-md transition-all h-7
+                ${paymentFilter === 'unpaid'
+                  ? 'bg-white text-amber-600 shadow-xs dark:bg-zinc-900 dark:text-amber-400'
+                  : 'text-zinc-500 hover:text-amber-500 dark:text-zinc-400'}`}
+            >
+              مانده
+            </button>
+          </div>
+        </div>
+
         {/* Date Ranges */}
-        <div className="grid grid-cols-2 gap-2 md:col-span-5 items-end">
+        <div className="grid grid-cols-2 gap-2 md:col-span-4 items-end">
           {/* From Date */}
           <div className="relative">
             <label className="text-xs mb-1 font-semibold text-zinc-500 dark:text-zinc-400">از تاریخ</label>

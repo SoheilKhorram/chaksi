@@ -51,6 +51,7 @@ export default async function Page() {
       }))
       : [],
     totalCost: session.totalCost,
+    isPaid: session.isPaid,
     createdAt: session.createdAt.toISOString(),
     updatedAt: session.updatedAt.toISOString(),
   }))

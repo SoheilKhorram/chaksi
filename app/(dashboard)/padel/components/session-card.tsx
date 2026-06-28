@@ -7,10 +7,11 @@ interface SessionCardProps {
   session: PadelSession
   onEdit: (session: PadelSession) => void
   onDelete: (id: string) => void
+  onTogglePaid: (id: string) => void
   isPending?: boolean
 }
 
-export function SessionCard({ session, onEdit, onDelete, isPending = false }: SessionCardProps) {
+export function SessionCard({ session, onEdit, onDelete, onTogglePaid, isPending = false }: SessionCardProps) {
   return (
     <div
       className={`group relative overflow-hidden rounded-xl border bg-white p-5 shadow-sm transition-all hover:shadow-md dark:bg-zinc-900/40 dark:hover:bg-zinc-900/60
@@ -29,6 +30,20 @@ export function SessionCard({ session, onEdit, onDelete, isPending = false }: Se
             >
               {session.type === 'game' ? 'بازی / مسابقه' : 'تمرین'}
             </span>
+
+            {/* Payment Status Badge */}
+            <button
+              onClick={() => onTogglePaid(session.id)}
+              disabled={isPending}
+              title="برای تغییر وضعیت پرداخت کلیک کنید"
+              className={`inline-flex items-center rounded-full px-2.25 py-1.5 text-xs font-semibold cursor-pointer border select-none transition-all active:scale-95 disabled:pointer-events-none disabled:opacity-50
+                ${session.isPaid
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-800/40 hover:bg-emerald-100 dark:hover:bg-emerald-500/20'
+                  : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-800/40 hover:bg-amber-100 dark:hover:bg-amber-500/20'}`}
+            >
+              {session.isPaid ? 'تسویه شده' : 'تسویه نشده'}
+            </button>
+
             <span className="text-xs text-zinc-400 dark:text-zinc-500">•</span>
             <span className="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
               <CalendarIcon className="h-3 w-3" />

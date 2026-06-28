@@ -41,6 +41,8 @@ export function LogSessionDialog({ open, onOpenChange, settings, partner }: LogS
     extraItems,
     sendToPartner,
     setSendToPartner,
+    isPaid,
+    setIsPaid,
     error,
     success,
     calculatedPreviewPrice,
@@ -236,6 +238,18 @@ export function LogSessionDialog({ open, onOpenChange, settings, partner }: LogS
               />
             </div>
           )}
+
+          {/* Payment Status Option */}
+          <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 pt-3">
+            <Label htmlFor="log-is-paid" className="cursor-pointer text-sm">
+              به عنوان تسویه/پرداخت شده ثبت شود؟
+            </Label>
+            <Checkbox
+              id="log-is-paid"
+              checked={isPaid}
+              onCheckedChange={(checked) => setIsPaid(!!checked)}
+            />
+          </div>
 
           {/* Extra Items List */}
           <div className="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
