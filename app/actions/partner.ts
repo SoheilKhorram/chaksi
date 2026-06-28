@@ -43,8 +43,8 @@ export async function sendPartnerRequestAction(
     const existing = await prisma.partnerRequest.findFirst({
       where: {
         OR: [
-          { senderId: user.id, receiverId: cleanReceiverId },
-          { senderId: cleanReceiverId, receiverId: user.id }
+          { senderId: user.id, receiverId: receiver.id },
+          { senderId: receiver.id, receiverId: user.id }
         ]
       }
     })
@@ -56,7 +56,7 @@ export async function sendPartnerRequestAction(
       if (existing.senderId === user.id) {
         return { success: false, error: 'درخواست هم‌تیمی قبلاً برای این کاربر ارسال شده است و منتظر تایید است.' }
       }
-      if (existing.senderId === cleanReceiverId) {
+      if (existing.senderId === receiver.id) {
         // Automatically accept the request if it exists in the other direction!
         await acceptPartnerRequestAction(existing.id)
         return { success: true, error: undefined } // Indicates success (and auto-accepted)
@@ -67,7 +67,7 @@ export async function sendPartnerRequestAction(
     await prisma.partnerRequest.create({
       data: {
         senderId: user.id,
-        receiverId: cleanReceiverId,
+        receiverId: receiver.id,
         status: 'PENDING'
       }
     })
