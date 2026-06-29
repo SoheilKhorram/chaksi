@@ -5,6 +5,7 @@ import { SearchIcon, CalendarIcon, XIcon, SlidersHorizontalIcon } from 'lucide-r
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Calendar } from '@/components/ui/calendar'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 interface SessionFiltersProps {
   playersFilter: string
@@ -49,7 +50,7 @@ export function SessionFilters({
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
         {/* Search Players */}
-        <div className="space-y-1.5 md:col-span-3">
+        <div className="space-y-1.5 md:col-span-4">
           <label htmlFor="players-search" className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
             جستجوی بازیکنان / هم‌بازی‌ها
           </label>
@@ -77,75 +78,63 @@ export function SessionFilters({
         {/* Session Type */}
         <div className="space-y-1.5 md:col-span-2">
           <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">نوع جلسه</label>
-          <div className="grid grid-cols-3 gap-0.5 p-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 h-9 items-center">
-            <button
-              type="button"
-              onClick={() => setTypeFilter('all')}
-              className={`py-1 text-xs font-semibold rounded-md transition-all h-7
-                ${typeFilter === 'all'
-                  ? 'bg-white text-zinc-900 shadow-xs dark:bg-zinc-900 dark:text-zinc-50'
-                  : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400'}`}
-            >
-              همه
-            </button>
-            <button
-              type="button"
-              onClick={() => setTypeFilter('game')}
-              className={`py-1 text-xs font-semibold rounded-md transition-all h-7
-                ${typeFilter === 'game'
-                  ? 'bg-white text-emerald-600 shadow-xs dark:bg-zinc-900 dark:text-emerald-400'
-                  : 'text-zinc-500 hover:text-emerald-500 dark:text-zinc-400'}`}
-            >
-              بازی
-            </button>
-            <button
-              type="button"
-              onClick={() => setTypeFilter('training')}
-              className={`py-1 text-xs font-semibold rounded-md transition-all h-7
-                ${typeFilter === 'training'
-                  ? 'bg-white text-blue-600 shadow-xs dark:bg-zinc-900 dark:text-blue-400'
-                  : 'text-zinc-500 hover:text-blue-500 dark:text-zinc-400'}`}
-            >
-              تمرین
-            </button>
-          </div>
+          <Tabs
+            value={typeFilter}
+            onValueChange={(val) => setTypeFilter(val as 'all' | 'game' | 'training')}
+            className="w-full"
+          >
+            <TabsList className="grid grid-cols-3 w-full min-h-9 p-[3px] bg-zinc-100 dark:bg-input/30">
+              <TabsTrigger
+                value="all"
+                className="text-xs font-semibold h-7 data-active:text-zinc-900 dark:data-active:text-zinc-50"
+              >
+                همه
+              </TabsTrigger>
+              <TabsTrigger
+                value="game"
+                className="text-xs font-semibold h-7 data-active:text-emerald-600 dark:data-active:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-400"
+              >
+                بازی
+              </TabsTrigger>
+              <TabsTrigger
+                value="training"
+                className="text-xs font-semibold h-7 data-active:text-blue-600 dark:data-active:text-blue-400 hover:text-blue-500 dark:hover:text-blue-400"
+              >
+                تمرین
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
 
         {/* Payment Status */}
-        <div className="space-y-1.5 md:col-span-3">
+        <div className="space-y-1.5 md:col-span-2">
           <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">وضعیت پرداخت</label>
-          <div className="grid grid-cols-3 gap-0.5 p-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 h-9 items-center">
-            <button
-              type="button"
-              onClick={() => setPaymentFilter('all')}
-              className={`py-1 text-xs font-semibold rounded-md transition-all h-7
-                ${paymentFilter === 'all'
-                  ? 'bg-white text-zinc-900 shadow-xs dark:bg-zinc-900 dark:text-zinc-50'
-                  : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400'}`}
-            >
-              همه
-            </button>
-            <button
-              type="button"
-              onClick={() => setPaymentFilter('paid')}
-              className={`py-1 text-xs font-semibold rounded-md transition-all h-7
-                ${paymentFilter === 'paid'
-                  ? 'bg-white text-emerald-600 shadow-xs dark:bg-zinc-900 dark:text-emerald-400'
-                  : 'text-zinc-500 hover:text-emerald-500 dark:text-zinc-400'}`}
-            >
-              تسویه
-            </button>
-            <button
-              type="button"
-              onClick={() => setPaymentFilter('unpaid')}
-              className={`py-1 text-xs font-semibold rounded-md transition-all h-7
-                ${paymentFilter === 'unpaid'
-                  ? 'bg-white text-amber-600 shadow-xs dark:bg-zinc-900 dark:text-amber-400'
-                  : 'text-zinc-500 hover:text-amber-500 dark:text-zinc-400'}`}
-            >
-              مانده
-            </button>
-          </div>
+          <Tabs
+            value={paymentFilter}
+            onValueChange={(val) => setPaymentFilter(val as 'all' | 'paid' | 'unpaid')}
+            className="w-full"
+          >
+            <TabsList className="grid grid-cols-3 w-full min-h-9 p-[3px] bg-zinc-100 dark:bg-input/30">
+              <TabsTrigger
+                value="all"
+                className="text-xs font-semibold h-7 data-active:text-zinc-900 dark:data-active:text-zinc-50"
+              >
+                همه
+              </TabsTrigger>
+              <TabsTrigger
+                value="paid"
+                className="text-xs font-semibold h-7 data-active:text-emerald-600 dark:data-active:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-400"
+              >
+                تسویه
+              </TabsTrigger>
+              <TabsTrigger
+                value="unpaid"
+                className="text-xs font-semibold h-7 data-active:text-amber-600 dark:data-active:text-amber-400 hover:text-amber-500 dark:hover:text-amber-400"
+              >
+                مانده
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
 
         {/* Date Ranges */}
