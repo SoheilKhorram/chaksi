@@ -173,7 +173,7 @@ export function LogSessionDialog({ open, onOpenChange, settings, partner }: LogS
                 required
                 className="h-9"
               />
-              {['1.0', '1.5', '2.0'].map((val) => (
+              {['1', '1.5', '2'].map((val) => (
                 <button
                   key={val}
                   type="button"
