@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useLogSessionForm } from '../hooks/use-log-session-form'
 import { PadelSettings } from '../types'
 import { formatPrice } from '../utils'
@@ -90,28 +91,26 @@ export function LogSessionDialog({ open, onOpenChange, settings, partner }: LogS
           {/* Type Switcher */}
           <div className="space-y-1.5">
             <Label>نوع جلسه</Label>
-            <div className="grid grid-cols-2 gap-2 p-1 rounded-lg bg-zinc-100 dark:bg-zinc-800">
-              <button
-                type="button"
-                onClick={() => setType('game')}
-                className={`py-1.5 text-xs font-semibold rounded-md transition-all
-                  ${type === 'game'
-                    ? 'bg-white text-emerald-600 shadow-sm dark:bg-zinc-900 dark:text-emerald-400'
-                    : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400'}`}
-              >
-                بازی / مسابقه
-              </button>
-              <button
-                type="button"
-                onClick={() => setType('training')}
-                className={`py-1.5 text-xs font-semibold rounded-md transition-all
-                  ${type === 'training'
-                    ? 'bg-white text-blue-600 shadow-sm dark:bg-zinc-900 dark:text-blue-400'
-                    : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400'}`}
-              >
-                تمرین
-              </button>
-            </div>
+            <Tabs
+              value={type}
+              onValueChange={(val) => setType(val as 'game' | 'training')}
+              className="w-full"
+            >
+              <TabsList className="grid grid-cols-2 w-full min-h-9 p-[3px] bg-zinc-100 dark:bg-input/30">
+                <TabsTrigger
+                  value="game"
+                  className="text-xs font-semibold h-7 data-active:text-emerald-600 dark:data-active:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-400"
+                >
+                  بازی / مسابقه
+                </TabsTrigger>
+                <TabsTrigger
+                  value="training"
+                  className="text-xs font-semibold h-7 data-active:text-blue-600 dark:data-active:text-blue-400 hover:text-blue-500 dark:hover:text-blue-400"
+                >
+                  تمرین
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
 
           {/* Date */}
