@@ -61,14 +61,14 @@ export function SessionFilters({
       <div className="flex gap-2 items-center">
         {/* Search Field */}
         <div className="relative flex-1">
-          <SearchIcon className="absolute start-3 top-2.5 h-4 w-4 text-zinc-400 dark:text-zinc-500" />
+          <SearchIcon className="absolute start-3 top-2.5 h-4 w-4 text-zinc-400 dark:text-muted-foreground" />
           <Input
             id="players-search"
             type="text"
             placeholder="جستجوی بازیکنان / هم‌بازی‌ها..."
             value={playersFilter}
             onChange={(e) => setPlayersFilter(e.target.value)}
-            className="ps-9 h-10 text-xs bg-white dark:bg-zinc-900/40 border-zinc-200/80 dark:border-zinc-800/80 rounded-xl"
+            className="ps-9 h-10 text-xs bg-white dark:bg-zinc-900/40 border-zinc-200/80 dark:border-zinc-800/80 rounded-xl truncate"
           />
           {playersFilter && (
             <button
@@ -108,18 +108,7 @@ export function SessionFilters({
         <div className="flex flex-wrap items-center gap-1.5 text-xs text-zinc-500 animate-slide-up">
           <span className="font-semibold text-zinc-400 dark:text-zinc-500 me-1">فیلترهای فعال:</span>
 
-          {/* Search Term Badge */}
-          {playersFilter.trim() !== '' && (
-            <span className="inline-flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 px-2.5 py-1 rounded-lg border border-zinc-200/50 dark:border-zinc-700/50 font-medium">
-              <span>جستجو: {playersFilter}</span>
-              <button
-                onClick={() => setPlayersFilter('')}
-                className="text-zinc-400 hover:text-red-500 rounded-full p-0.5"
-              >
-                <XIcon className="h-3 w-3" />
-              </button>
-            </span>
-          )}
+
 
           {/* Type Badge */}
           {typeFilter !== 'all' && (

@@ -58,7 +58,6 @@ export function PadelClient({
   }
 
   const handleClearFilters = () => {
-    setPlayersFilter('')
     setTypeFilter('all')
     setPaymentFilter('all')
     setFromDate(undefined)
@@ -66,7 +65,6 @@ export function PadelClient({
   }
 
   const hasActiveFilters =
-    playersFilter !== '' ||
     typeFilter !== 'all' ||
     paymentFilter !== 'all' ||
     fromDate !== undefined ||
