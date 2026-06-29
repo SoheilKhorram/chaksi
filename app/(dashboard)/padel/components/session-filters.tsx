@@ -156,14 +156,14 @@ export function SessionFilters({
             <Button
               type="button"
               variant="outline"
-              className="w-full justify-start text-left font-normal h-9 px-3 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-xs"
+              className="w-full justify-start text-left font-normal h-9 px-3 border-input bg-transparent dark:bg-input/30 text-xs"
               onClick={() => {
                 setShowFromPicker(!showFromPicker)
                 setShowToPicker(false)
               }}
             >
-              <CalendarIcon className="me-2 h-3.5 w-3.5 text-zinc-400 shrink-0" />
-              <span className="">
+              <CalendarIcon className="me-2 h-3.5 w-3.5 text-muted-foreground shrink-0" />
+              <span className={fromDate ? '' : 'text-muted-foreground'}>
                 {fromDate ? (
                   fromDate.toLocaleDateString('fa-IR', {
                     weekday: 'long',
@@ -199,14 +199,14 @@ export function SessionFilters({
             <Button
               type="button"
               variant="outline"
-              className="w-full justify-start text-left font-normal h-9 px-3 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-xs"
+              className="w-full justify-start text-left font-normal h-9 px-3 border-input bg-transparent dark:bg-input/30 text-xs"
               onClick={() => {
                 setShowToPicker(!showToPicker)
                 setShowFromPicker(false)
               }}
             >
-              <CalendarIcon className="me-2 h-3.5 w-3.5 text-zinc-400 shrink-0" />
-              <span className="">
+              <CalendarIcon className="me-2 h-3.5 w-3.5 text-muted-foreground shrink-0" />
+              <span className={toDate ? '' : 'text-muted-foreground'} >
                 {toDate ? (
                   toDate.toLocaleDateString('fa-IR', {
                     weekday: 'long',

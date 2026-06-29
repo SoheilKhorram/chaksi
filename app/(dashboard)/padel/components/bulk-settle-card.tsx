@@ -130,14 +130,14 @@ export function BulkSettleCard({ sessions }: BulkSettleCardProps) {
             <Button
               type="button"
               variant="outline"
-              className="w-full justify-start text-left font-normal h-9 px-3 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-xs"
+              className="w-full justify-start text-left font-normal h-9 px-3 border-input bg-transparent dark:bg-input/30 text-xs"
               onClick={() => {
                 setShowStartPicker(!showStartPicker)
                 setShowEndPicker(false)
               }}
             >
-              <CalendarIcon className="me-2 h-4 w-4 text-zinc-400 shrink-0" />
-              <span>
+              <CalendarIcon className="me-2 h-4 w-4 text-muted-foreground shrink-0" />
+              <span className={startDate ? '' : 'text-muted-foreground'}>
                 {startDate ? (
                   startDate.toLocaleDateString('fa-IR', {
                     weekday: 'long',
@@ -145,7 +145,7 @@ export function BulkSettleCard({ sessions }: BulkSettleCardProps) {
                     day: 'numeric',
                   })
                 ) : (
-                  'انتخاب تاریخ شروع'
+                  'انتخاب تاریخ'
                 )}
               </span>
             </Button>
@@ -173,14 +173,14 @@ export function BulkSettleCard({ sessions }: BulkSettleCardProps) {
             <Button
               type="button"
               variant="outline"
-              className="w-full justify-start text-left font-normal h-9 px-3 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-xs"
+              className="w-full justify-start text-left font-normal h-9 px-3 border-input bg-transparent dark:bg-input/30 text-xs"
               onClick={() => {
                 setShowEndPicker(!showEndPicker)
                 setShowStartPicker(false)
               }}
             >
-              <CalendarIcon className="me-2 h-4 w-4 text-zinc-400 shrink-0" />
-              <span>
+              <CalendarIcon className="me-2 h-4 w-4 text-muted-foreground shrink-0" />
+              <span className={endDate ? '' : 'text-muted-foreground'}>
                 {endDate ? (
                   endDate.toLocaleDateString('fa-IR', {
                     weekday: 'long',
@@ -188,7 +188,7 @@ export function BulkSettleCard({ sessions }: BulkSettleCardProps) {
                     day: 'numeric',
                   })
                 ) : (
-                  'انتخاب تاریخ پایان'
+                  'انتخاب تاریخ'
                 )}
               </span>
             </Button>

@@ -120,7 +120,7 @@ export function PadelClient({
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">مدیریت جلسات</h1>
           </div>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">جلسات بازی، تمرینات، نرخ‌ها و هزینه‌های زمین خود رو ثبت و ردیابی کن.</p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">مدیریت بازی‌ها، تمرین‌ها و هزینه‌های زمین</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <Button
