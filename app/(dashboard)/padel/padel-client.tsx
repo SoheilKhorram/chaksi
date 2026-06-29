@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Settings2Icon, PlusIcon } from 'lucide-react'
+import { Settings2Icon, PlusIcon, WalletIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { PadelSession, PadelSettings, SharedSession } from './types'
 import { calculateStats, toLocalDateString } from './utils'
@@ -14,7 +14,8 @@ import { EditSessionDialog } from './components/edit-session-dialog'
 import { DeleteConfirmDialog } from './components/delete-confirm-dialog'
 import { SessionFilters } from './components/session-filters'
 import { SharedSessionsList } from './components/shared-sessions-list'
-import { BulkSettleCard } from './components/bulk-settle-card'
+import { BulkSettleDialog } from './components/bulk-settle-dialog'
+
 import { togglePadelSessionPaidAction } from '@/app/actions/padel'
 
 interface PadelClientProps {
@@ -35,6 +36,7 @@ export function PadelClient({
   const [showLogModal, setShowLogModal] = useState(false)
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
+  const [showBulkSettleModal, setShowBulkSettleModal] = useState(false)
 
   // Active items for edit/delete
   const [sessionIdToDelete, setSessionIdToDelete] = useState<string | null>(null)
@@ -124,6 +126,21 @@ export function PadelClient({
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <Button
+            onClick={() => setShowLogModal(true)}
+            className="h-10 font-bold px-4 gap-2 shadow-xs transition-transform active:scale-[0.98]"
+          >
+            <PlusIcon className="h-4 w-4" />
+            جلسه جدید
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setShowBulkSettleModal(true)}
+            className="h-10 font-bold px-4 gap-2 border-emerald-500/30 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 dark:border-emerald-500/20 dark:text-emerald-400 dark:hover:bg-emerald-500/10 transition-transform active:scale-[0.98]"
+          >
+            <WalletIcon className="h-4 w-4" />
+            تسویه حساب
+          </Button>
+          <Button
             variant="outline"
             size="icon"
             onClick={() => setShowSettingsModal(true)}
@@ -131,13 +148,6 @@ export function PadelClient({
             title="نرخ‌های ساعتی پیش‌فرض"
           >
             <Settings2Icon className="h-4.5 w-4.5" />
-          </Button>
-          <Button
-            onClick={() => setShowLogModal(true)}
-            className="h-10 font-bold px-4 gap-2 shadow-xs transition-transform active:scale-[0.98]"
-          >
-            <PlusIcon className="h-4 w-4" />
-            ثبت جلسه جدید
           </Button>
         </div>
       </div>
@@ -147,9 +157,6 @@ export function PadelClient({
 
       {/* Shared Sessions List */}
       <SharedSessionsList sharedSessions={initialSharedSessions} />
-
-      {/* Dynamic Settle Section */}
-      <BulkSettleCard sessions={initialSessions} />
 
       {/* Session Filters */}
       <SessionFilters
@@ -222,6 +229,13 @@ export function PadelClient({
           setShowDeleteConfirmModal(false)
           setSessionIdToDelete(null)
         }}
+      />
+
+      {/* Bulk Settle Modal */}
+      <BulkSettleDialog
+        open={showBulkSettleModal}
+        onOpenChange={setShowBulkSettleModal}
+        sessions={initialSessions}
       />
     </div>
   )
