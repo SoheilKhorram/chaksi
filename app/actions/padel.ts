@@ -95,7 +95,7 @@ export async function createPadelSessionAction(
     await prisma.padelSession.create({
       data: {
         userId: user.id,
-        date: new Date(date),
+        date: new Date(date + 'T00:00:00.000Z'),
         duration: Number(duration),
         players: players.trim(),
         type: type,
@@ -138,7 +138,7 @@ export async function createPadelSessionAction(
           data: {
             senderId: user.id,
             receiverId: partnerId,
-            date: new Date(date),
+            date: new Date(date + 'T00:00:00.000Z'),
             duration: Number(duration),
             players: players.trim(),
             type: type,
@@ -238,7 +238,7 @@ export async function updatePadelSessionAction(
     await prisma.padelSession.update({
       where: { id: sessionId },
       data: {
-        date: new Date(date),
+        date: new Date(date + 'T00:00:00.000Z'),
         duration: Number(duration),
         players: players.trim(),
         type: type,
@@ -395,10 +395,9 @@ export async function markSessionsPaidInRangeAction(
       return { success: false, error: 'تاریخ شروع و پایان الزامی است.' }
     }
 
-    const startDate = new Date(startDateStr)
-    startDate.setHours(0, 0, 0, 0)
-    const endDate = new Date(endDateStr)
-    endDate.setHours(23, 59, 59, 999)
+    const startDate = new Date(startDateStr + 'T00:00:00.000Z')
+    const endDate = new Date(endDateStr + 'T23:59:59.999Z')
+
 
     await prisma.padelSession.updateMany({
       where: {

@@ -48,6 +48,7 @@ export function SessionCard({ session, onEdit, onDelete, onTogglePaid, isPending
             <span className="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
               <CalendarIcon className="h-3 w-3" />
               {new Date(session.date).toLocaleDateString('fa-IR', {
+                timeZone: 'UTC',
                 weekday: 'long',
                 month: 'long',
                 day: 'numeric',

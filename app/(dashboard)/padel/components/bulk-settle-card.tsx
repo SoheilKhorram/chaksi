@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { markSessionsPaidInRangeAction, markAllSessionsPaidAction } from '@/app/actions/padel'
 import { PadelSession } from '../types'
-import { formatPrice } from '../utils'
+import { formatPrice, toLocalDateString } from '../utils'
+
 import { ConfirmRangeSettleDialog } from './confirm-range-settle-dialog'
 import { ConfirmAllSettleDialog } from './confirm-all-settle-dialog'
 
@@ -50,19 +51,17 @@ export function BulkSettleCard({ sessions }: BulkSettleCardProps) {
     })
   }
 
-  // Memoized calculations for selected range
   const unpaidSessionsInRange = useMemo(() => {
     if (!startDate || !endDate) return []
-    const start = new Date(startDate)
-    start.setHours(0, 0, 0, 0)
-    const end = new Date(endDate)
-    end.setHours(23, 59, 59, 999)
+    const startStr = toLocalDateString(startDate)
+    const endStr = toLocalDateString(endDate)
 
     return sessions.filter((session) => {
-      const sessionDate = new Date(session.date)
-      return !session.isPaid && sessionDate >= start && sessionDate <= end
+      const sessionDateStr = session.date.split('T')[0]
+      return !session.isPaid && sessionDateStr >= startStr && sessionDateStr <= endStr
     })
   }, [sessions, startDate, endDate])
+
 
   const totalUnpaidCost = useMemo(() => {
     return unpaidSessionsInRange.reduce((sum, s) => sum + s.totalCost, 0)
@@ -74,9 +73,10 @@ export function BulkSettleCard({ sessions }: BulkSettleCardProps) {
     setSuccess(false)
 
     startSettleTransition(async () => {
-      const startStr = startDate.toISOString().split('T')[0]
-      const endStr = endDate.toISOString().split('T')[0]
+      const startStr = toLocalDateString(startDate)
+      const endStr = toLocalDateString(endDate)
       const res = await markSessionsPaidInRangeAction(startStr, endStr)
+
 
       if (res.success) {
         setSuccess(true)

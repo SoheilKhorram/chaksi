@@ -59,3 +59,12 @@ export function parseInputNumber(value: string | undefined | null): number {
   const cleanValue = englishDigits.replace(/\D/g, '')
   return cleanValue ? parseInt(cleanValue, 10) : 0
 }
+
+// Returns local date formatted as YYYY-MM-DD to avoid timezone shifts
+export function toLocalDateString(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+

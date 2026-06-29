@@ -54,7 +54,7 @@ export function DeleteConfirmDialog({ open, onOpenChange, sessionId, onSuccess }
           </div>
         </div>
 
-        <DialogFooter className="flex items-center justify-end gap-3 pt-6 border-t border-zinc-100 dark:border-zinc-800 mt-2">
+        <DialogFooter className="flex items-center flex-row justify-end gap-3 pt-6 border-t border-zinc-100 dark:border-zinc-800 mt-2">
           <Button
             type="button"
             variant="outline"

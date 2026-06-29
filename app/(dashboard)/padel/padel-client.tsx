@@ -4,7 +4,8 @@ import { useState, useTransition } from 'react'
 import { Settings2Icon, PlusIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { PadelSession, PadelSettings, SharedSession } from './types'
-import { calculateStats } from './utils'
+import { calculateStats, toLocalDateString } from './utils'
+
 import { StatsDashboard } from './components/stats-dashboard'
 import { SessionHistory } from './components/session-history'
 import { SettingsDialog } from './components/settings-dialog'
@@ -94,17 +95,16 @@ export function PadelClient({
     }
 
     // 3. Filter by date range
-    const sessionDate = new Date(session.date)
+    const sessionDateStr = session.date.split('T')[0]
     if (fromDate) {
-      const startOfFrom = new Date(fromDate)
-      startOfFrom.setHours(0, 0, 0, 0)
-      if (sessionDate < startOfFrom) return false
+      const fromDateStr = toLocalDateString(fromDate)
+      if (sessionDateStr < fromDateStr) return false
     }
     if (toDate) {
-      const endOfTo = new Date(toDate)
-      endOfTo.setHours(23, 59, 59, 999)
-      if (sessionDate > endOfTo) return false
+      const toDateStr = toLocalDateString(toDate)
+      if (sessionDateStr > toDateStr) return false
     }
+
 
     return true
   })

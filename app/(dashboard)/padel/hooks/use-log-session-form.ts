@@ -1,7 +1,7 @@
 import { useState, useTransition, useMemo } from 'react'
 import { createPadelSessionAction } from '@/app/actions/padel'
 import { PadelSettings, ExtraItemForm } from '../types'
-import { formatInputNumber, parseInputNumber } from '../utils'
+import { formatInputNumber, parseInputNumber, toLocalDateString } from '../utils'
 
 export function useLogSessionForm(settings: PadelSettings, onSuccess?: () => void) {
   const [isPending, startTransition] = useTransition()
@@ -83,7 +83,7 @@ export function useLogSessionForm(settings: PadelSettings, onSuccess?: () => voi
         }))
 
       const res = await createPadelSessionAction({
-        date: selectedDate ? selectedDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        date: selectedDate ? toLocalDateString(selectedDate) : toLocalDateString(new Date()),
         duration: hours,
         players: players,
         type,

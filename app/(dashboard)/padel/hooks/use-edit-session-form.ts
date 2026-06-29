@@ -1,7 +1,7 @@
 import { useState, useTransition, useMemo } from 'react'
 import { updatePadelSessionAction } from '@/app/actions/padel'
 import { PadelSession, PadelSettings, ExtraItemForm } from '../types'
-import { formatInputNumber, parseInputNumber } from '../utils'
+import { formatInputNumber, parseInputNumber, toLocalDateString } from '../utils'
 
 export function useEditSessionForm(
   session: PadelSession,
@@ -93,7 +93,7 @@ export function useEditSessionForm(
         }))
 
       const res = await updatePadelSessionAction(session.id, {
-        date: selectedDate ? selectedDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        date: selectedDate ? toLocalDateString(selectedDate) : toLocalDateString(new Date()),
         duration: hours,
         players: players,
         type,
